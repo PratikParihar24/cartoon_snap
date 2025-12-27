@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartoon Snap</title>
+    <link rel="stylesheet" href="style.css"> </head>
+<body>
+
+    <div class="game-board">
+
+        <div class="player-zone" id="opponent-zone">
+            <div class="player-info">
+                <span class="name">Opponent</span>
+                <span class="card-count">Cards: <span id="opp-count">26</span></span>
+            </div>
+            <div class="deck-container">
+                <div class="card back"></div> </div>
+        </div>
+
+        <div class="center-zone">
+            <div id="center-pile" class="pile-slot">
+                <div class="placeholder-text">Center Pile</div>
+            </div>
+            
+        <button id="snap-btn" class="snap-button hidden">SNAP! ⚡</button>
+            
+            
+            <div id="game-status" class="status-message">Waiting for players...</div>
+        </div>
+
+        <div class="player-zone" id="player-zone">
+            <div class="deck-container" id="my-deck">
+                <div class="card back"></div> </div>
+            <div class="player-info">
+                <span class="name">YOU</span>
+                <span class="card-count">Cards: <span id="my-count">26</span></span>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script> </body>
+</html>

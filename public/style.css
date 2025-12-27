@@ -1,0 +1,146 @@
+/* public/style.css */
+
+/* 1. Global Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #2c3e50; /* Dark Blue-Grey background for modern look */
+    color: white;
+    height: 100vh; /* Full screen height */
+    overflow: hidden; /* Prevent scrolling */
+}
+
+/* 2. Main Game Layout */
+.game-board {
+    display: flex;
+    flex-direction: column; /* Stack Top, Middle, Bottom */
+    justify-content: space-between;
+    height: 100%;
+    padding: 20px;
+    background: radial-gradient(circle, #27ae60 0%, #145a32 100%); /* Green Casino Felt */
+}
+
+/* 3. Player Zones (Top and Bottom) */
+.player-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 25%; /* Take up 1/4 of the screen each */
+}
+
+.player-info {
+    margin-top: 10px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px black;
+}
+
+/* 4. The Center Battle Zone */
+.center-zone {
+    flex-grow: 1; /* Take up all remaining space in the middle */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.pile-slot {
+    width: 120px;
+    height: 170px;
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative; /* Needed so we can stack cards on top */
+}
+
+.placeholder-text {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+}
+
+/* 5. Card Design (The "Component") */
+.card {
+    width: 100px;
+    height: 150px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #333;
+    border: 4px solid white;
+    transition: transform 0.1s; /* Animation for clicking */
+    cursor: pointer;
+}
+
+/* The "Back" of the card (Deck) */
+.card.back {
+    background: repeating-linear-gradient(
+        45deg,
+        #c0392b,
+        #c0392b 10px,
+        #e74c3c 10px,
+        #e74c3c 20px
+    );
+    border: 2px solid white;
+}
+
+/* Hover Effect for YOUR deck only */
+#player-zone .card:hover {
+    transform: translateY(-10px); /* Lifts up slightly */
+    box-shadow: 0 8px 12px rgba(0,0,0,0.5);
+}
+
+/* 6. Status Message */
+.status-message {
+    margin-top: 20px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    background-color: rgba(0,0,0,0.5);
+    padding: 10px 20px;
+    border-radius: 20px;
+}
+
+
+
+/* public/style.css */
+
+/* The Hidden Helper */
+.hidden {
+    display: none !important;
+}
+
+/* The SNAP Button */
+.snap-button {
+    margin-top: 20px;
+    padding: 15px 40px;
+    font-size: 2rem;
+    font-weight: 900;
+    color: white;
+    background-color: #e74c3c; /* Red */
+    border: 4px solid white;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 0 20px #c0392b;
+    animation: pulse 0.5s infinite alternate; /* Make it throb */
+}
+
+.snap-button:active {
+    transform: scale(0.95);
+}
+
+@keyframes pulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.1); }
+}
