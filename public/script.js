@@ -153,6 +153,27 @@ socket.on('game_start', (data) => {
 // 1. The Game Starts
 socket.on('game_start', (data) => {
     console.log("Game Started!", data);
+
+    // 1. Identify Opponent
+    const opponent = data.players.find(p => p.id !== socket.id);
+    const me = data.players.find(p => p.id === socket.id);
+
+    // 2. Set Names
+    document.getElementById('opp-name-display').innerText = opponent.name;
+    document.getElementById('my-name-display').innerText = me.name;
+
+    // 3. GENERATE AVATARS (Bottts Style)
+    const myAvatar = document.getElementById('my-avatar');
+    const oppAvatar = document.getElementById('opp-avatar');
+
+    // API URL: generates a unique robot based on the name string
+    myAvatar.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${me.name}`;
+    oppAvatar.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${opponent.name}`;
+
+    // Show them
+    myAvatar.classList.remove('hidden');
+    oppAvatar.classList.remove('hidden');
+
     myHand = data.hand;
     isMyTurn = data.isMyTurn;
 
@@ -247,7 +268,9 @@ snapBtn.addEventListener('click', () => {
 // 5. Handle Snap Success
 socket.on('snap_success', (data) => {
     playSound(audioSnap);
-    alert(`${data.winnerName} WON THE PILE!`);
+    fireConfetti();
+    // ✨ NEW FLASH MESSAGE
+    showFlashMessage(`${data.winnerName} WINS!`);
     snapBtn.classList.add('hidden');
     centerPile.innerHTML = `<div class="placeholder-text">Center Pile</div>`;
     isMatchActive = false; 
@@ -275,24 +298,25 @@ socket.on('game_update', (data) => {
     });
 });
 
-// 7. Game Over
-socket.on('game_over', (data) => {
-    isMyTurn = false;
-    isMatchActive = false;
-    snapBtn.classList.add('hidden');
-    myDeck.style.border = "2px solid gray";
+// 7 : game over
 
-    if (socket.id === data.winnerId) {
+socket.on('game_over', (data) => {
+    // 1. Determine who won
+    const amIWinner = (socket.id === data.winnerId);
+    
+    if (amIWinner) {
         playSound(audioWin);
-        statusMsg.innerText = "🏆 VICTORY! YOU WON! 🏆";
-        statusMsg.style.color = "#2ecc71";
-        document.body.style.backgroundColor = "#27ae60"; 
-        setTimeout(() => alert("🏆 CONGRATULATIONS! You won!"), 100);
+        fireConfetti(); // Celebration!
+        showFlashMessage("🏆 VICTORY! 🏆");
     } else {
-        statusMsg.innerText = "💀 GAME OVER";
-        statusMsg.style.color = "#e74c3c"; 
-        setTimeout(() => alert("💀 GAME OVER!"), 100);
+        showFlashMessage("💀 DEFEAT 💀");
     }
+
+    // 2. Reset UI for next round
+    centerPile.innerHTML = `<div class="placeholder-text">Game Over</div>`;
+    snapBtn.classList.add('hidden');
+    isMatchActive = false;
+    isGameOver = true;
 });
 
 
@@ -327,22 +351,28 @@ resumeBtn.addEventListener('click', () => {
 
 // 2. Restart Game (Reset Deck for both players)
 restartBtn.addEventListener('click', () => {
-    if (confirm("Are you sure you want to restart the game?")) {
-        socket.emit('request_restart', { roomId: currentRoomId });
-        menuModal.classList.add('hidden'); // Close menu
-    }
+    // Instant Restart (Removes the annoying confirm)
+    socket.emit('request_restart', { roomId: currentRoomId });
+    menuModal.classList.add('hidden'); 
 });
 
 // 3. Leave Room (Go back to Lobby)
 leaveBtn.addEventListener('click', () => {
-    if (confirm("Are you sure you want to leave?")) {
-        // Reloading the page is the easiest way to "Disconnect" and reset state
-        window.location.reload(); 
-    }
+    // 🚫 Replaced standard confirm() with Custom Modal
+    
+    showCustomAlert(
+        "Leave Game?", 
+        "Are you sure you want to quit? You will lose your progress.", 
+        () => {
+            // This code runs only if they click "OK"
+            window.location.reload(); 
+        }
+    );
 });
 
 // 4. Handle Restart Signal (from Server)
 socket.on('game_restarted', () => {
+    showFlashMessage("RESTART!");
     // Just show a small notification
     statusMsg.innerText = "🔄 Game Restarted!";
     centerPile.innerHTML = `<div class="placeholder-text">Center Pile</div>`;
@@ -357,7 +387,11 @@ socket.on('game_restarted', () => {
 // 9. Handle Opponent Leaving
 socket.on('opponent_left', () => {
     // 1. Notify the user
-    alert("Your opponent has left the game! Returning to lobby...");
+    showCustomAlert(
+        "Game Over", 
+        "Your opponent fled the battle! Returning to lobby...", 
+        () => { window.location.reload(); } // Action on click
+    );
     
     // 2. Reset the game by reloading the page
     // This is the cleanest way to clear all game state and variables
@@ -411,3 +445,66 @@ function updateCardBacks() {
         card.style.backgroundPosition = 'center';
     });
 }
+
+// --- CONFETTI FX ---
+function fireConfetti() {
+    // Blast from the left
+    confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6, x: 0.4 },
+        colors: ['#FF6B6B', '#4ECDC4', '#FFE66D'] // Your theme colors
+    });
+    
+    // Blast from the right
+    confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6, x: 0.6 },
+        colors: ['#FF6B6B', '#4ECDC4', '#FFE66D']
+    });
+}
+
+
+// --- CUSTOM UI HELPERS ---
+
+// 1. Show Big Flash Message (For Snaps)
+function showFlashMessage(text) {
+    const flashDiv = document.getElementById('flash-message');
+    const flashText = document.getElementById('flash-text');
+    
+    flashText.innerText = text;
+    flashDiv.classList.remove('hidden');
+    
+    // Auto-hide after animation (1.5s matches CSS animation)
+    setTimeout(() => {
+        flashDiv.classList.add('hidden');
+    }, 1500);
+}
+
+// 2. Show Custom Alert Modal (For Errors/Leaves)
+function showCustomAlert(title, message, callback) {
+    const modal = document.getElementById('alert-modal');
+    document.getElementById('alert-title').innerText = title;
+    document.getElementById('alert-msg').innerText = message;
+    
+    const btn = document.getElementById('alert-btn');
+    
+    // Clear old listeners to prevent stacking
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+    
+    newBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');
+        if (callback) callback();
+    });
+    
+    modal.classList.remove('hidden');
+}
+
+// Handle errors (like "Room Full" or "Game in Progress")
+socket.on('init_error', (msg) => {
+    showCustomAlert("Error", msg, () => {
+        window.location.reload(); // Send them back to start
+    });
+});
