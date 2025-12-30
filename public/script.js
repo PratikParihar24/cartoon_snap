@@ -2,95 +2,171 @@
 
 const socket = io();
 
-// --- DOM Elements (The things we want to change) ---
+// --- DOM Elements ---
+// Screens
+const lobbyScreen = document.getElementById('lobby-screen');
+const gameScreen = document.getElementById('game-screen');
+
+// Lobby Controls
+const createBtn = document.getElementById('create-btn');
+const joinBtn = document.getElementById('join-btn');
+const roomInput = document.getElementById('room-code-input');
+const lobbyStatus = document.getElementById('lobby-status');
+
+// Game Board Elements
 const myCountDisplay = document.getElementById('my-count');
 const oppCountDisplay = document.getElementById('opp-count');
 const statusMsg = document.getElementById('game-status');
 const myDeck = document.getElementById('my-deck');
 const centerPile = document.getElementById('center-pile');
 const snapBtn = document.getElementById('snap-btn');
+const roomDisplay = document.getElementById('room-display'); // New!
+
+// --- NEW WAITING ROOM DOM ELEMENTS ---
+const usernameInput = document.getElementById('username-input');
+const waitingScreen = document.getElementById('waiting-screen');
+const displayRoomCode = document.getElementById('display-room-code');
+const copyBtn = document.getElementById('copy-btn');
+const whatsappBtn = document.getElementById('whatsapp-btn');
+const myNameDisplay = document.getElementById('my-name-display');
+const oppNameDisplay = document.getElementById('opp-name-display');
 
 // --- Game Variables ---
 let myHand = [];
 let isMyTurn = false;
-let isMatchActive = false; // <--- NEW: The Lock
-let isGameOver = false; // To prevent actions after game ends
+let isMatchActive = false;
+let isGameOver = false;
+let currentRoomId = null; // <--- V2 CRITICAL: We must remember our room!
 
-// 1. Connection Logic
-socket.on('connect', () => {
-    console.log("Connected to server!");
-    statusMsg.innerText = "Waiting for opponent...";
+// ========================================================
+// A. LOBBY LOGIC (NEW)
+// ========================================================
+
+// 1. Create Game
+createBtn.addEventListener('click', () => {
+    const name = usernameInput.value.trim();
+    if (!name) { alert("Please enter your name!"); return; }
+
+    console.log("Creating room as " + name);
+    // V2 Update: Send name along with request
+    socket.emit('create_room', { name: name });
 });
 
-socket.on('game_full', () => {
-    statusMsg.innerText = "Error: Game is Full!";
-    statusMsg.style.color = "red";
+// 2. Join Game
+joinBtn.addEventListener('click', () => {
+    const name = usernameInput.value.trim();
+    const code = roomInput.value.trim().toUpperCase();
+
+    if (!name) { alert("Please enter your name!"); return; }
+    if (!code) { alert("Please enter a Room Code!"); return; }
+
+    console.log(`Joining room ${code} as ${name}`);
+    // V2 Update: Send name along with request
+    socket.emit('join_room', { roomId: code, name: name });
 });
 
-// 2. The Game Starts!
-// This event comes from server/gameLogic.js inside startGame()
+// 3. Room Created -> GO TO WAITING SCREEN
+socket.on('room_created', (data) => {
+    currentRoomId = data.roomId;
+    
+    // Hide Lobby, Show Waiting Room
+    lobbyScreen.classList.add('hidden');
+    waitingScreen.classList.remove('hidden');
+    
+    // Display the code
+    displayRoomCode.innerText = data.roomId;
+
+    // Set Up WhatsApp Share Link
+    // This opens WhatsApp with a pre-filled message
+    const message = `Hey! Join my Cartoon Snap game. \nCode: *${data.roomId}* \nLink: ${window.location.href}`;
+    whatsappBtn.onclick = () => {
+        window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+    };
+});
+
+// 4. COPY BUTTON LOGIC
+copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(currentRoomId).then(() => {
+        const originalText = copyBtn.innerText;
+        copyBtn.innerText = "✅ Copied!";
+        setTimeout(() => copyBtn.innerText = originalText, 2000);
+    });
+});
+
+// 5. Game Start -> GO TO GAME BOARD
+socket.on('game_start', (data) => {
+    // Hide Waiting Screen (if open)
+    waitingScreen.classList.add('hidden');
+    lobbyScreen.classList.add('hidden'); // Ensure lobby is gone
+    gameScreen.classList.remove('hidden');
+
+    // Setup Game Data
+    myHand = data.hand;
+    isMyTurn = data.isMyTurn;
+    currentRoomId = data.roomId; // Ensure ID is set for the joiner
+
+    // UPDATE NAMES ON UI
+    myNameDisplay.innerText = data.myName + " (YOU)";
+    oppNameDisplay.innerText = data.oppName;
+
+    myCountDisplay.innerText = myHand.length; 
+    oppCountDisplay.innerText = data.opponentCardCount; 
+    
+    if (isMyTurn) {
+        statusMsg.innerText = "YOUR TURN";
+        myDeck.style.border = "4px solid yellow";
+    } else {
+        statusMsg.innerText = "Opponent's Turn";
+        myDeck.style.border = "2px solid white";
+    }
+});
+
+// ========================================================
+// B. GAMEPLAY LOGIC (UPDATED FOR V2)
+// ========================================================
+
+// 1. The Game Starts
 socket.on('game_start', (data) => {
     console.log("Game Started!", data);
-
-    // Update Local Variables
     myHand = data.hand;
     isMyTurn = data.isMyTurn;
 
-    // Update UI
-    myCountDisplay.innerText = myHand.length; // Should be 26
-    oppCountDisplay.innerText = data.opponentCardCount; // Should be 26
+    myCountDisplay.innerText = myHand.length; 
+    oppCountDisplay.innerText = data.opponentCardCount; 
     
     if (isMyTurn) {
         statusMsg.innerText = "Game Started! YOUR TURN";
-        myDeck.style.border = "4px solid yellow"; // Highlight my deck
+        myDeck.style.border = "4px solid yellow";
     } else {
         statusMsg.innerText = "Game Started! Opponent's Turn";
         myDeck.style.border = "2px solid white";
     }
 });
 
-// public/script.js (Add to the bottom)
-
-// 3. User Interaction (Clicking the Deck)
+// 2. User Plays a Card
 myDeck.addEventListener('click', () => {
-
-    if (isGameOver) {
-        return; 
-    }
-    // 1. New Check: If match is active, STOP!
+    if (isGameOver) return; 
     if (isMatchActive) {
         alert("IT'S A MATCH! CLICK THE SNAP BUTTON!");
         return;
     }
-
-    // Basic Rule Check: Is it my turn? Do I have cards?
     if (!isMyTurn) {
         alert("Wait for your turn!"); 
         return; 
     }
-
-    
-    
     if (myHand.length === 0) {
         alert("You have no cards left!");
         return;
     }
 
-    // If checks pass, tell the server!
-    console.log("Sending 'play_card' event...");
-    socket.emit('play_card');
+    // V2 UPDATE: We send the roomId now!
+    socket.emit('play_card', { roomId: currentRoomId });
 });
 
-
-// public/script.js (Add to the bottom)
-
-// 4. Listen for updates from Server
-// public/script.js
-
+// 3. Server Updates Board
 socket.on('card_played', (data) => {
-    console.log("Card played:", data.card);
-
     // A. Show the Card
+    // (Later we will replace this with the Image Logic we discussed)
     centerPile.innerHTML = `
         <div class="card">
             ${data.card.character}<br>
@@ -98,8 +174,7 @@ socket.on('card_played', (data) => {
         </div>
     `;
 
-    // B. UPDATE CARD COUNTS (The Fix 🛠️)
-    // We loop through the data sent by server and update the UI
+    // B. Update Counts
     data.players.forEach(player => {
         if (player.id === socket.id) {
             myCountDisplay.innerText = player.count;
@@ -130,55 +205,25 @@ socket.on('card_played', (data) => {
         }
     }
 });
-    // C. Update Counts (Optional for now, but good practice)
-    // We simply subtract 1 from whoever's turn it was.
-    // Ideally, the server sends fresh counts, but let's keep it simple.
-    const currentMyCount = parseInt(myCountDisplay.innerText);
-    const currentOppCount = parseInt(oppCountDisplay.innerText);
 
-    // If I just played (it's NO LONGER my turn), my count goes down
-    if (!isMyTurn) { 
-        myCountDisplay.innerText = currentMyCount - 1;
-    } else {
-        oppCountDisplay.innerText = currentOppCount - 1;
-    }
-
-    // public/script.js (Add to bottom)
-
-// 5. Handle SNAP Button Click
-// public/script.js
-
+// 4. Handle SNAP Button
 snapBtn.addEventListener('click', () => {
-    console.log("🔴 BUTTON CLICKED! Sending 'snap_attempt' to server..."); // Check console for this
-    socket.emit('snap_attempt');
+    console.log("🔴 SNAP CLICKED!");
+    // V2 UPDATE: Send roomId
+    socket.emit('snap_attempt', { roomId: currentRoomId });
     snapBtn.classList.add('hidden');
 });
-// public/script.js
 
-// 6. Handle Winning Animation & Cleanup (THE FIX)
+// 5. Handle Snap Success
 socket.on('snap_success', (data) => {
-    // A. Notify who won
-    // (Optional: You can remove the alert later if it's too annoying)
     alert(`${data.winnerName} WON THE PILE!`);
-    
-    // B. CRITICAL: Hide the button for EVERYONE
-    // Even if I didn't click it, I must hide mine now because the race is over.
     snapBtn.classList.add('hidden');
-    
-    // C. Clear the center pile visually
     centerPile.innerHTML = `<div class="placeholder-text">Center Pile</div>`;
-    
-    // D. CRITICAL: Unlock the game state for EVERYONE
-    // This fixes the "Please click snap" bug on the next turn.
     isMatchActive = false; 
 });
 
-// 7. Handle Game State Update (Counts)
-// public/script.js
-
+// 6. Game Updates (Counts)
 socket.on('game_update', (data) => {
-    
-    // 1. Update Turn Logic (Existing)
     if (socket.id === data.turn) {
         isMyTurn = true;
         statusMsg.innerText = "YOUR TURN";
@@ -189,57 +234,31 @@ socket.on('game_update', (data) => {
         myDeck.style.border = "2px solid white";
     }
 
-    // 2. Update Card Counts (NEW FIX) 🛠️
     data.players.forEach(player => {
         if (player.id === socket.id) {
-            // This is ME
             myCountDisplay.innerText = player.count;
-            
-            // Safety Check: Did I run out of cards?
-            if (player.count === 0) {
-                 alert("GAME OVER! You have 0 cards. You Lose!");
-            }
+            if (player.count === 0) alert("GAME OVER! You Lose!");
         } else {
-            // This is OPPONENT
             oppCountDisplay.innerText = player.count;
         }
     });
 });
 
-// public/script.js (At the bottom)
-
-// public/script.js (At the bottom)
-
-/// public/script.js
-
-// 8. Handle Game Over
+// 7. Game Over
 socket.on('game_over', (data) => {
-    // 1. Force update the status immediately
     isMyTurn = false;
     isMatchActive = false;
-    snapBtn.classList.add('hidden'); // Hide snap button if it was there
-    myDeck.style.border = "2px solid gray"; // Lock the deck
+    snapBtn.classList.add('hidden');
+    myDeck.style.border = "2px solid gray";
 
-    // 2. Check: Am I the Winner or Loser?
     if (socket.id === data.winnerId) {
-        // I AM THE WINNER
         statusMsg.innerText = "🏆 VICTORY! YOU WON! 🏆";
-        statusMsg.style.color = "#2ecc71"; // Bright Green
-        statusMsg.style.fontSize = "2rem"; // Make it BIG
-        document.body.style.backgroundColor = "#27ae60"; // Celebrate with green background
-        
-        // Small delay so they see the text before the alert
-        setTimeout(() => {
-            alert("🏆 CONGRATULATIONS! You won the game!");
-        }, 100);
-
+        statusMsg.style.color = "#2ecc71";
+        document.body.style.backgroundColor = "#27ae60"; 
+        setTimeout(() => alert("🏆 CONGRATULATIONS! You won!"), 100);
     } else {
-        // I AM THE LOSER
         statusMsg.innerText = "💀 GAME OVER";
-        statusMsg.style.color = "#e74c3c"; // Red
-        
-        setTimeout(() => {
-            alert("💀 GAME OVER! You ran out of cards.");
-        }, 100);
+        statusMsg.style.color = "#e74c3c"; 
+        setTimeout(() => alert("💀 GAME OVER!"), 100);
     }
 });

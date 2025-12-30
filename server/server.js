@@ -5,8 +5,9 @@ const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
 
-// 1. IMPORT ALL FUNCTIONS (Ensure handleSnap is here)
-const { addPlayer, removePlayer, playCard, handleSnap } = require('./gamelogic');
+// 1. IMPORT THE NEW LOGIC
+// We are importing the new "Room-aware" functions we just wrote in Step 3
+const { createRoom, joinRoom, playCard, handleSnap, removePlayer } = require('./gamelogic');
 
 const app = express();
 const server = http.createServer(app);
@@ -16,26 +17,47 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 // 2. THE CONNECTION BLOCK
 io.on('connection', (socket) => {
-    // A. Handle New Player
-    addPlayer(socket, io); 
+    console.log(`New User Connected: ${socket.id}`);
 
-    // B. Handle Playing a Card
-    socket.on('play_card', () => {
-        playCard(socket.id, io);
+    // A. LOBBY LISTENERS (New for V2)
+    // -------------------------------------------------
+    
+   // User clicks "Create Game"
+    socket.on('create_room', (data) => {
+        // data = { name: "Pratik" }
+        createRoom(socket, io, data.name);
     });
 
-    // =================================================
-    // 🚨 THIS IS THE MISSING PART!
-    // It MUST be inside the io.on(...) curly brackets.
-    // =================================================
-    socket.on('snap_attempt', () => {
-        console.log(`⚡ SERVER HEARD SNAP from ${socket.id}`);
-        handleSnap(socket.id, io);
+    // User types code and clicks "Join Game"
+    socket.on('join_room', (data) => {
+        // data = { roomId: "XYZ", name: "Friend" }
+        joinRoom(socket, io, data.roomId, data.name);
     });
-    // =================================================
 
-    // D. Handle Disconnect
+
+    // B. GAMEPLAY LISTENERS (Updated for V2)
+    // -------------------------------------------------
+    // Note: We now expect 'data' to contain the { roomId } 
+    // because the server needs to know WHICH game to update.
+
+    socket.on('play_card', (data) => {
+        // data looks like: { roomId: "X7Z9P" }
+        if (data && data.roomId) {
+            playCard(socket, io, data.roomId);
+        }
+    });
+
+    socket.on('snap_attempt', (data) => {
+        console.log(`⚡ SNAP ATTEMPT from ${socket.id} in Room ${data.roomId}`);
+        if (data && data.roomId) {
+            handleSnap(socket, io, data.roomId);
+        }
+    });
+
+    // C. DISCONNECT
+    // -------------------------------------------------
     socket.on('disconnect', () => {
+        console.log(`User Disconnected: ${socket.id}`);
         removePlayer(socket.id);
     });
 });

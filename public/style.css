@@ -144,3 +144,122 @@ body {
     from { transform: scale(1); }
     to { transform: scale(1.1); }
 }
+
+
+
+/* --- LOBBY STYLES (Version 2 Addition) --- */
+
+/* Utility to hide screens */
+.hidden {
+    display: none !important;
+}
+
+.lobby-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle, #2c3e50 0%, #000000 100%);
+    text-align: center;
+}
+
+.lobby-container h1 {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    color: #f1c40f; /* Yellow */
+    text-shadow: 2px 2px 0px #e67e22;
+}
+
+.lobby-controls {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 40px;
+    border-radius: 15px;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.main-btn, .secondary-btn {
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: transform 0.2s;
+}
+
+.main-btn {
+    background-color: #27ae60;
+    color: white;
+    width: 100%;
+}
+
+.main-btn:hover { background-color: #2ecc71; transform: scale(1.05); }
+
+.secondary-btn {
+    background-color: #3498db;
+    color: white;
+}
+
+.secondary-btn:hover { background-color: #5dade2; transform: scale(1.05); }
+
+.divider { margin: 20px 0; font-weight: bold; color: #aaa; }
+
+input[type="text"] {
+    padding: 15px;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    border: none;
+    margin-right: 10px;
+    width: 200px;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+/* --- WAITING ROOM STYLES --- */
+
+.code-display {
+    background: white;
+    color: #2c3e50;
+    padding: 20px 40px;
+    font-size: 3rem;
+    font-weight: 900;
+    border-radius: 10px;
+    margin: 20px 0;
+    letter-spacing: 5px;
+    border: 4px dashed #f1c40f;
+}
+
+.share-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.action-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    background-color: #34495e;
+}
+
+.action-btn:hover { transform: scale(1.05); }
+
+.whatsapp {
+    background-color: #25D366; /* Official WhatsApp Green */
+}
+
+.blinking-text {
+    animation: blink 1.5s infinite;
+    color: #bdc3c7;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}

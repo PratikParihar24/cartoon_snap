@@ -1,223 +1,226 @@
-// server/gameLogic.js
+// server/gamelogic.js
 
 const Deck = require('./classes/Deck');
 
-// 1. The State Object (The Memory)
-let gameState = {
-    players: [],      // Will hold max 2 players
-    deck: null,       // Will hold the card deck
-    gameStatus: 'WAITING', // WAITING, ACTIVE
-    centerPile: []    // The cards on the table
-};
+// ============================================================
+// THE HOTEL REGISTRY (The Memory)
+// ============================================================
+// Instead of one 'gameState', we have a dictionary of many rooms.
+// Format: { "A1B2C3": { players: [], deck: ..., status: ... } }
+const rooms = {}; 
 
-// 2. Function to handle a new player joining
-function addPlayer(socket , io) {
+// Helper: Generate a random 6-character Room ID
+function generateRoomId() {
+    return Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
+// ============================================================
+// 1. CREATE ROOM
+// ============================================================
+// server/gamelogic.js
+
+// Update createRoom to accept 'playerName'
+function createRoom(socket, io, playerName) {
+    const roomId = generateRoomId();
     
-    // Check if we already have 2 players
-    if (gameState.players.length >= 2) {
-        console.log(`Game is full. ${socket.id} cannot join.`);
-        socket.emit('game_full', { message: 'Sorry, the game is full!' });
+    rooms[roomId] = {
+        id: roomId,
+        players: [],      
+        deck: null,
+        centerPile: [],
+        gameStatus: 'WAITING'
+    };
+
+    const player1 = {
+        id: socket.id,
+        name: playerName || "Player 1", // Fallback if empty
+        hand: []
+    };
+    rooms[roomId].players.push(player1);
+    socket.join(roomId);
+    socket.emit('room_created', { roomId: roomId });
+}
+
+// Update joinRoom to accept 'playerName'
+function joinRoom(socket, io, roomId, playerName) {
+    const room = rooms[roomId];
+
+    if (!room) {
+        socket.emit('error', { message: "Room not found!" });
+        return;
+    }
+    if (room.players.length >= 2) {
+        socket.emit('error', { message: "Room is full!" });
         return;
     }
 
-    // Determine if this is Player 1 or Player 2
-    const playerIndex = gameState.players.length; // 0 or 1
-    const playerName = `Player ${playerIndex + 1}`;
-
-    // Add them to our "Memory"
-    const newPlayer = {
+    const player2 = {
         id: socket.id,
-        name: playerName,
-        hand: [] // Empty for now
+        name: playerName || "Player 2",
+        hand: []
     };
-    gameState.players.push(newPlayer);
+    room.players.push(player2);
+    socket.join(roomId);
 
-    console.log(`${playerName} joined! (${socket.id})`);
-
-    // Tell the specific user "Welcome, you are Player X"
-    socket.emit('welcome', { 
-        name: playerName, 
-        playerId: socket.id 
-    });
-
-    // If we have 2 players, we can START the game!
-    if (gameState.players.length === 2) {
-        console.log("⚡ Two players connected. Starting Game!");
-        startGame(io); 
+    // START GAME with Names
+    if (room.players.length === 2) {
+        startGame(io, roomId);
     }
 }
 
-// 3. Function to Start the Game
-// server/gameLogic.js (Update these parts)
+// Update startGame to Send Names
+function startGame(io, roomId) {
+    const room = rooms[roomId];
+    room.gameStatus = 'ACTIVE';
 
-// ... (Keep the imports and addPlayer function the same) ...
-
-// UPDATE THIS FUNCTION
-function startGame(io) { // <--- Note: We now accept 'io' as a parameter
-    gameState.gameStatus = 'ACTIVE';
-    console.log("--> Game Status changed to ACTIVE");
-
-    // 1. Create and Shuffle Deck
+    // ... (Deck shuffling logic is same) ...
     const gameDeck = new Deck();
     gameDeck.shuffle();
-
-    // 2. Deal Cards
     const { player1Hand, player2Hand } = gameDeck.deal();
+    
+    room.players[0].hand = player1Hand;
+    room.players[1].hand = player2Hand;
 
-    // 3. Assign cards to the specific player objects in our state
-    // (We assume player[0] is P1 and player[1] is P2)
-    gameState.players[0].hand = player1Hand;
-    gameState.players[1].hand = player2Hand;
-
-    // 4. Send the data to the clients (The "Deal")
-    // usage: io.to(socketId).emit(...) sends a message ONLY to that person.
-
-    // Send Player 1 their cards
-    io.to(gameState.players[0].id).emit('game_start', {
-        hand: player1Hand,    // They can see their own cards
-        opponentCardCount: 26, // They only know HOW MANY cards opp has
-        isMyTurn: true        // Player 1 goes first
+    // SEND NAMES TO PLAYERS
+    // To Player 1:
+    io.to(room.players[0].id).emit('game_start', {
+        hand: player1Hand,
+        opponentCardCount: 26,
+        isMyTurn: true,
+        roomId: roomId,
+        myName: room.players[0].name,   // Your Name
+        oppName: room.players[1].name   // Opponent Name
     });
 
-    // Send Player 2 their cards
-    io.to(gameState.players[1].id).emit('game_start', {
+    // To Player 2:
+    io.to(room.players[1].id).emit('game_start', {
         hand: player2Hand,
         opponentCardCount: 26,
-        isMyTurn: false       // Player 2 waits
+        isMyTurn: false,
+        roomId: roomId,
+        myName: room.players[1].name,
+        oppName: room.players[0].name
     });
-
-    console.log("🃏 Cards dealt. Game started!");
 }
 
-// ... (Keep removePlayer same) ...
-// 4. Function to handle Disconnects
-function removePlayer(socketId) {
-    // Filter out the player who left
-    gameState.players = gameState.players.filter(p => p.id !== socketId);
-    gameState.gameStatus = 'WAITING';
-    console.log(`Player ${socketId} left. Game reset to WAITING.`);
-}
+// ============================================================
+// 4. PLAY CARD
+// ============================================================
+function playCard(socket, io, roomId) {
+    const room = rooms[roomId];
+    if (!room || room.gameStatus !== 'ACTIVE') return;
 
-// server/gameLogic.js
+    // Find the player who clicked
+    const playerIndex = room.players.findIndex(p => p.id === socket.id);
+    if (playerIndex === -1) return; // Player not in this room?
 
-// ... (Keep existing code above) ...
+    const player = room.players[playerIndex];
 
-// server/gameLogic.js (Updated playCard function)
-
-// server/gameLogic.js
-
-// server/gameLogic.js
-
-// server/gameLogic.js
-
-function playCard(socketId, io) {
-    const playerIndex = gameState.players.findIndex(p => p.id === socketId);
-    const player = gameState.players[playerIndex];
-
-    // 1. Move the card
+    // logic: Move card from hand to pile
     const playedCard = player.hand.pop();
-    gameState.centerPile.push(playedCard);
+    room.centerPile.push(playedCard);
 
-    // 2. Identify Opponent
+    // Identify Opponent (for turn switching)
     const nextPlayerIndex = (playerIndex + 1) % 2;
-    const nextPlayerId = gameState.players[nextPlayerIndex].id;
+    const nextPlayerId = room.players[nextPlayerIndex].id;
 
-    // 3. Check Match (Standard Logic)
+    // Check Match (Logic remains same as V1)
     let isMatch = false;
-    if (gameState.centerPile.length >= 2) {
-        const last = gameState.centerPile[gameState.centerPile.length - 1];
-        const prev = gameState.centerPile[gameState.centerPile.length - 2];
+    if (room.centerPile.length >= 2) {
+        const last = room.centerPile[room.centerPile.length - 1];
+        const prev = room.centerPile[room.centerPile.length - 2];
         if (last.character === prev.character) {
             isMatch = true;
         }
     }
 
-    // 4. FIRST: Update the Board for Everyone (So they see the card)
-    io.emit('card_played', {
+    // BROADCAST UPDATE TO THE ROOM
+    // We use io.to(roomId) so only people in this game see it
+    io.to(roomId).emit('card_played', {
         card: playedCard,
         turn: nextPlayerId,
-        pileCount: gameState.centerPile.length,
         isMatch: isMatch,
         players: [
-            { id: gameState.players[0].id, count: gameState.players[0].hand.length },
-            { id: gameState.players[1].id, count: gameState.players[1].hand.length }
+            { id: room.players[0].id, count: room.players[0].hand.length },
+            { id: room.players[1].id, count: room.players[1].hand.length }
         ]
     });
 
-    // 5. SECOND: Check Game Over (Immediately after updating UI)
+    // Check Game Over (Empty Hand)
     if (player.hand.length === 0) {
-        console.log(`🏁 GAME OVER! ${player.name} is out of cards.`);
-        
-        // Broadcast the result to EVERYONE
-        io.emit('game_over', {
-            winnerId: nextPlayerId, // The other player wins
-            loserId: socketId       // The current player loses
-        });
-        
-        gameState.gameStatus = 'ENDED';
+        finishGame(io, roomId, nextPlayerId, socket.id); // Opponent wins
     }
 }
 
-function handleSnap(socketId, io) {
-    // 1. Verify: Is there actually a match?
-    // (This prevents cheaters from sending fake snap signals)
-    const pile = gameState.centerPile;
-    if (pile.length < 2) return; // Cannot snap with 1 card
+// ============================================================
+// 5. HANDLE SNAP
+// ============================================================
+function handleSnap(socket, io, roomId) {
+    const room = rooms[roomId];
+    if (!room) return;
 
+    const pile = room.centerPile;
+    if (pile.length < 2) return;
+
+    // Verify Match
     const last = pile[pile.length - 1];
     const prev = pile[pile.length - 2];
 
     if (last.character !== prev.character) {
-        console.log(`False Start! User ${socketId} clicked snap but no match.`);
-        return; // Ignore false snaps for now (or add penalty later)
+        console.log(`[FALSE SNAP] in Room ${roomId}`);
+        return; 
     }
 
-    // 2. Identify the Winner
-    const winnerIndex = gameState.players.findIndex(p => p.id === socketId);
-    const winner = gameState.players[winnerIndex];
+    // Winner Logic
+    const winnerIndex = room.players.findIndex(p => p.id === socket.id);
+    const winner = room.players[winnerIndex];
 
-    console.log(`🎉 SNAP! ${winner.name} won ${pile.length} cards!`);
+    // Give cards to winner
+    winner.hand.unshift(...room.centerPile);
+    room.centerPile = [];
 
-    // 3. Give Cards to Winner
-    // We put the pile at the BOTTOM of their hand (unshift)
-    // Note: We move the whole pile array into their hand
-    winner.hand.unshift(...gameState.centerPile);
-
-    // 4. Clear the Center Pile
-    gameState.centerPile = [];
-
-    // 5. Update Everyone
-    io.emit('snap_success', {
-        winnerId: socketId,
-        winnerName: winner.name,
-        pileSize: 0 
+    // Notify Room
+    io.to(roomId).emit('snap_success', {
+        winnerId: socket.id,
+        winnerName: winner.name
     });
 
-    // 6. Resume Game & Send Updated Counts
-    io.emit('game_update', {
-        turn: socketId, // Winner keeps turn
-        // We send the specific count for each player ID
+    // Resume Game
+    io.to(roomId).emit('game_update', {
+        turn: socket.id, // Winner keeps turn
         players: [
-            { id: gameState.players[0].id, count: gameState.players[0].hand.length },
-            { id: gameState.players[1].id, count: gameState.players[1].hand.length }
+            { id: room.players[0].id, count: room.players[0].hand.length },
+            { id: room.players[1].id, count: room.players[1].hand.length }
         ]
-    });
-
-    // ...
-
-    // 6. Resume Game: The Winner gets to play the next card
-    // We send a "reset" state
-    io.emit('game_update', {
-        turn: socketId, // Winner keeps turn
-        player1Count: gameState.players[0].hand.length,
-        player2Count: gameState.players[1].hand.length
     });
 }
 
+// ============================================================
+// 6. CLEANUP (Disconnect)
+// ============================================================
+function removePlayer(socketId) {
+    // We must find which room this player was in
+    // This is a bit inefficient (looping all rooms), but fine for MVP
+    for (const roomId in rooms) {
+        const room = rooms[roomId];
+        const playerExists = room.players.find(p => p.id === socketId);
 
+        if (playerExists) {
+            console.log(`[DISCONNECT] Player left Room ${roomId}`);
+            // Remove the room entirely (Game Abandoned)
+            delete rooms[roomId];
+            return;
+        }
+    }
+}
 
-// 👇 MAKE SURE 'handleSnap' IS IN THIS LIST 👇
-module.exports = { addPlayer, removePlayer, playCard, handleSnap, gameState };
+// Helper: End Game
+function finishGame(io, roomId, winnerId, loserId) {
+    io.to(roomId).emit('game_over', {
+        winnerId: winnerId,
+        loserId: loserId
+    });
+    delete rooms[roomId]; // Cleanup
+}
 
-
-
+module.exports = { createRoom, joinRoom, playCard, handleSnap, removePlayer };

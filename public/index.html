@@ -7,33 +7,70 @@
     <link rel="stylesheet" href="style.css"> </head>
 <body>
 
-    <div class="game-board">
+    <div id="lobby-screen" class="lobby-container">
+        <h1>Cartoon Snap!</h1>
+        <p>Enter your name to get started</p>
+        
+        <input type="text" id="username-input" placeholder="Your Name" maxlength="12" style="margin-bottom: 20px;">
+
+        <div class="lobby-controls">
+            <button id="create-btn" class="main-btn">Create New Game</button>
+            
+            <div class="divider">- OR -</div>
+            
+            <div class="join-area">
+                <input type="text" id="room-code-input" placeholder="ROOM CODE" maxlength="6">
+                <button id="join-btn" class="secondary-btn">Join Game</button>
+            </div>
+        </div>
+        <p id="lobby-status" class="status-text"></p>
+    </div>
+
+    <div id="waiting-screen" class="lobby-container hidden">
+        <h2>Room Created!</h2>
+        <p>Share this code with your friend:</p>
+        
+        <div class="code-display">
+            <span id="display-room-code">LOADING...</span>
+        </div>
+
+        <div class="share-controls">
+            <button id="copy-btn" class="action-btn">📋 Copy Code</button>
+            <button id="whatsapp-btn" class="action-btn whatsapp">💬 WhatsApp</button>
+        </div>
+
+        <p class="blinking-text">Waiting for opponent to join...</p>
+    </div>
+
+    <div id="game-screen" class="game-board hidden">
 
         <div class="player-zone" id="opponent-zone">
             <div class="player-info">
-                <span class="name">Opponent</span>
+                <span class="name" id="opp-name-display">Opponent</span>
                 <span class="card-count">Cards: <span id="opp-count">26</span></span>
             </div>
             <div class="deck-container">
-                <div class="card back"></div> </div>
+                <div class="card back"></div> 
+            </div>
         </div>
 
         <div class="center-zone">
+            <div id="room-display" style="position: absolute; top: 10px; opacity: 0.5;">Room: ???</div>
+
             <div id="center-pile" class="pile-slot">
                 <div class="placeholder-text">Center Pile</div>
             </div>
             
-        <button id="snap-btn" class="snap-button hidden">SNAP! ⚡</button>
-            
-            
-            <div id="game-status" class="status-message">Waiting for players...</div>
+            <button id="snap-btn" class="snap-button hidden">SNAP! ⚡</button>
+            <div id="game-status" class="status-message">Waiting...</div>
         </div>
 
         <div class="player-zone" id="player-zone">
             <div class="deck-container" id="my-deck">
-                <div class="card back"></div> </div>
+                <div class="card back"></div> 
+            </div>
             <div class="player-info">
-                <span class="name">YOU</span>
+                <span class="name" id="my-name-display">YOU</span>
                 <span class="card-count">Cards: <span id="my-count">26</span></span>
             </div>
         </div>
@@ -41,5 +78,6 @@
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
-    <script src="script.js"></script> </body>
+    <script src="script.js"></script> 
+</body>
 </html>
