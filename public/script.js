@@ -31,12 +31,37 @@ const whatsappBtn = document.getElementById('whatsapp-btn');
 const myNameDisplay = document.getElementById('my-name-display');
 const oppNameDisplay = document.getElementById('opp-name-display');
 
+// --- MENU DOM ELEMENTS ---
+const menuBtn = document.getElementById('menu-btn');
+const menuModal = document.getElementById('menu-modal');
+const resumeBtn = document.getElementById('resume-btn');
+const restartBtn = document.getElementById('restart-btn');
+const leaveBtn = document.getElementById('leave-btn');
+
+
 // --- Game Variables ---
 let myHand = [];
 let isMyTurn = false;
 let isMatchActive = false;
 let isGameOver = false;
 let currentRoomId = null; // <--- V2 CRITICAL: We must remember our room!
+let currentSkin = 'default'; // Default skin
+
+// --- AUDIO SYSTEM ---
+const audioFlip = new Audio('/assets/audio/flip.wav');
+const audioSnap = new Audio('/assets/audio/snap.mp3');
+const audioWin = new Audio('/assets/audio/win.mp3');
+
+// Audio Settings
+let isMuted = false;
+
+// Helper: Play Sound safely
+function playSound(sound) {
+    if (!isMuted) {
+        sound.currentTime = 0; // Reset sound to start (allows rapid fire)
+        sound.play().catch(e => console.log("Audio play failed (browser blocked):", e));
+    }
+}
 
 // ========================================================
 // A. LOBBY LOGIC (NEW)
@@ -141,6 +166,7 @@ socket.on('game_start', (data) => {
         statusMsg.innerText = "Game Started! Opponent's Turn";
         myDeck.style.border = "2px solid white";
     }
+    updateCardBacks();
 });
 
 // 2. User Plays a Card
@@ -165,12 +191,16 @@ myDeck.addEventListener('click', () => {
 
 // 3. Server Updates Board
 socket.on('card_played', (data) => {
-    // A. Show the Card
-    // (Later we will replace this with the Image Logic we discussed)
+
+    playSound(audioFlip);
+
+
+    // A. Show the Card (UPDATED FOR IMAGES)
+    const imagePath = getCardImage(data.card.style, data.card.character);
+    
     centerPile.innerHTML = `
-        <div class="card">
-            ${data.card.character}<br>
-            <small>${data.card.style}</small>
+        <div class="card face-up">
+            <img src="${imagePath}" alt="${data.card.character}" class="card-img">
         </div>
     `;
 
@@ -216,6 +246,7 @@ snapBtn.addEventListener('click', () => {
 
 // 5. Handle Snap Success
 socket.on('snap_success', (data) => {
+    playSound(audioSnap);
     alert(`${data.winnerName} WON THE PILE!`);
     snapBtn.classList.add('hidden');
     centerPile.innerHTML = `<div class="placeholder-text">Center Pile</div>`;
@@ -252,6 +283,7 @@ socket.on('game_over', (data) => {
     myDeck.style.border = "2px solid gray";
 
     if (socket.id === data.winnerId) {
+        playSound(audioWin);
         statusMsg.innerText = "🏆 VICTORY! YOU WON! 🏆";
         statusMsg.style.color = "#2ecc71";
         document.body.style.backgroundColor = "#27ae60"; 
@@ -262,3 +294,120 @@ socket.on('game_over', (data) => {
         setTimeout(() => alert("💀 GAME OVER!"), 100);
     }
 });
+
+
+
+
+
+// Helper: Generate Image Path
+function getCardImage(style, character) {
+    // 1. Convert Style to lowercase (e.g., "Pixar" -> "pixar")
+    const folder = style.toLowerCase();
+    
+    // 2. Convert Character to lowercase AND replace spaces with underscores
+    // (e.g., "Ninja Hattori" -> "ninja_hattori")
+    const file = character.toLowerCase().replace(/ /g, '_'); // Regex replaces ALL spaces
+    
+    return `/assets/${folder}/${file}.png`;
+}   
+
+
+// ========================================================
+// C. MENU INTERACTIONS
+// ========================================================
+
+// 1. Toggle Menu
+menuBtn.addEventListener('click', () => {
+    menuModal.classList.remove('hidden');
+});
+
+resumeBtn.addEventListener('click', () => {
+    menuModal.classList.add('hidden');
+});
+
+// 2. Restart Game (Reset Deck for both players)
+restartBtn.addEventListener('click', () => {
+    if (confirm("Are you sure you want to restart the game?")) {
+        socket.emit('request_restart', { roomId: currentRoomId });
+        menuModal.classList.add('hidden'); // Close menu
+    }
+});
+
+// 3. Leave Room (Go back to Lobby)
+leaveBtn.addEventListener('click', () => {
+    if (confirm("Are you sure you want to leave?")) {
+        // Reloading the page is the easiest way to "Disconnect" and reset state
+        window.location.reload(); 
+    }
+});
+
+// 4. Handle Restart Signal (from Server)
+socket.on('game_restarted', () => {
+    // Just show a small notification
+    statusMsg.innerText = "🔄 Game Restarted!";
+    centerPile.innerHTML = `<div class="placeholder-text">Center Pile</div>`;
+    snapBtn.classList.add('hidden');
+    isMatchActive = false;
+    isGameOver = false;
+    menuModal.classList.add('hidden');
+});
+
+// public/script.js
+
+// 9. Handle Opponent Leaving
+socket.on('opponent_left', () => {
+    // 1. Notify the user
+    alert("Your opponent has left the game! Returning to lobby...");
+    
+    // 2. Reset the game by reloading the page
+    // This is the cleanest way to clear all game state and variables
+    window.location.reload(); 
+});
+
+const soundBtn = document.getElementById('sound-btn');
+
+soundBtn.addEventListener('click', () => {
+    isMuted = !isMuted; // Toggle the value
+    
+    if (isMuted) {
+        soundBtn.innerText = "🔇 Sound: OFF";
+        soundBtn.style.backgroundColor = "#95a5a6"; // Gray out the button
+    } else {
+        soundBtn.innerText = "🔊 Sound: ON";
+        soundBtn.style.backgroundColor = "#3498db"; // Blue again
+    }
+});
+
+// --- SKIN CUSTOMIZATION ---
+const skinOptions = document.querySelectorAll('.skin-option');
+
+skinOptions.forEach(option => {
+    option.addEventListener('click', () => {
+        // 1. Remove 'selected' class from all
+        skinOptions.forEach(opt => opt.classList.remove('selected'));
+        
+        // 2. Add 'selected' to clicked one
+        option.classList.add('selected');
+        
+        // 3. Update the variable
+        currentSkin = option.getAttribute('data-skin');
+        
+        // 4. Apply the new skin immediately!
+        updateCardBacks();
+        
+        console.log(`Skin changed to: ${currentSkin}`);
+    });
+});
+
+// Helper: Apply skin to all "back" cards
+function updateCardBacks() {
+    // Select all cards that are face-down (class "back")
+    const faceDownCards = document.querySelectorAll('.card.back');
+    
+    faceDownCards.forEach(card => {
+        // We set the background image via CSS variable or direct style
+        card.style.backgroundImage = `url('/assets/backs/${currentSkin}.png')`;
+        card.style.backgroundSize = 'cover';
+        card.style.backgroundPosition = 'center';
+    });
+}

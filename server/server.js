@@ -7,7 +7,7 @@ const path = require('path');
 
 // 1. IMPORT THE NEW LOGIC
 // We are importing the new "Room-aware" functions we just wrote in Step 3
-const { createRoom, joinRoom, playCard, handleSnap, removePlayer } = require('./gamelogic');
+const { createRoom, joinRoom, playCard, handleSnap, removePlayer ,restartGame} = require('./gamelogic');
 
 const app = express();
 const server = http.createServer(app);
@@ -54,12 +54,21 @@ io.on('connection', (socket) => {
         }
     });
 
+    // Handle Restart Request
+    socket.on('request_restart', (data) => {
+        if (data && data.roomId) {
+            restartGame(io, data.roomId);
+        }
+    });
+
     // C. DISCONNECT
     // -------------------------------------------------
     socket.on('disconnect', () => {
         console.log(`User Disconnected: ${socket.id}`);
-        removePlayer(socket.id);
-    });
+
+        // UPDATE: Pass 'io' as the first argument
+        removePlayer(io, socket.id);
+        });
 });
 
 const PORT = process.env.PORT || 3000;

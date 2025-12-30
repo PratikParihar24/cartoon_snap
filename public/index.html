@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style.css"> </head>
 <body>
 
+
     <div id="lobby-screen" class="lobby-container">
         <h1>Cartoon Snap!</h1>
         <p>Enter your name to get started</p>
@@ -44,6 +45,30 @@
 
     <div id="game-screen" class="game-board hidden">
 
+        <button id="menu-btn" class="menu-toggle">☰</button>
+
+    <div id="menu-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2>Game Menu</h2>
+            <button id="resume-btn" class="menu-item">▶ Resume Game</button>
+            <button id="sound-btn" class="menu-item">🔊 Sound: ON</button>
+
+            <div class="skin-selector">
+        <h3>Card Style</h3>
+        <div class="skin-options">
+            <img src="/assets/backs/default.png" data-skin="default" class="skin-option selected">
+            <img src="/assets/backs/blue.png" data-skin="blue" class="skin-option">
+            <img src="/assets/backs/modern.png" data-skin="modern" class="skin-option">
+        </div>
+    </div>
+
+    <hr style="margin: 15px 0; border: 0; border-top: 1px solid #ccc;">
+    
+            <button id="restart-btn" class="menu-item">🔄 Restart Game</button>
+            <button id="leave-btn" class="menu-item danger">🚪 Leave Room</button>
+        </div>
+    </div>
+
         <div class="player-zone" id="opponent-zone">
             <div class="player-info">
                 <span class="name" id="opp-name-display">Opponent</span>
@@ -55,7 +80,6 @@
         </div>
 
         <div class="center-zone">
-            <div id="room-display" style="position: absolute; top: 10px; opacity: 0.5;">Room: ???</div>
 
             <div id="center-pile" class="pile-slot">
                 <div class="placeholder-text">Center Pile</div>

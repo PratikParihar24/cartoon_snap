@@ -198,21 +198,33 @@ function handleSnap(socket, io, roomId) {
 // ============================================================
 // 6. CLEANUP (Disconnect)
 // ============================================================
-function removePlayer(socketId) {
-    // We must find which room this player was in
-    // This is a bit inefficient (looping all rooms), but fine for MVP
+// server/gamelogic.js
+
+// Updated removePlayer now requires 'io' to send messages
+function removePlayer(io, socketId) {
     for (const roomId in rooms) {
         const room = rooms[roomId];
-        const playerExists = room.players.find(p => p.id === socketId);
+        const playerIndex = room.players.findIndex(p => p.id === socketId);
 
-        if (playerExists) {
-            console.log(`[DISCONNECT] Player left Room ${roomId}`);
-            // Remove the room entirely (Game Abandoned)
+        if (playerIndex !== -1) {
+            console.log(`[DISCONNECT] Player ${socketId} left Room ${roomId}`);
+
+            // 1. Find the Other Player (The Survivor)
+            const otherPlayer = room.players.find(p => p.id !== socketId);
+
+            if (otherPlayer) {
+                // 2. Tell the Survivor that the game is over
+                io.to(otherPlayer.id).emit('opponent_left');
+            }
+
+            // 3. Destroy the Room (Game Over)
             delete rooms[roomId];
             return;
         }
     }
 }
+
+
 
 // Helper: End Game
 function finishGame(io, roomId, winnerId, loserId) {
@@ -223,4 +235,21 @@ function finishGame(io, roomId, winnerId, loserId) {
     delete rooms[roomId]; // Cleanup
 }
 
-module.exports = { createRoom, joinRoom, playCard, handleSnap, removePlayer };
+
+// Add this new function to gamelogic.js
+function restartGame(io, roomId) {
+    const room = rooms[roomId];
+    if (!room) return;
+
+    console.log(`[RESTART] Room ${roomId} is restarting...`);
+    
+    // 1. Reuse existing StartGame logic
+    // This will reshuffle, redeal, and send 'game_start' events again
+    startGame(io, roomId);
+
+    // 2. Notify clients specifically that it was a restart (optional UI cleanup)
+    io.to(roomId).emit('game_restarted');
+}
+
+// Ensure you export the same list as before!
+module.exports = { createRoom, joinRoom, playCard, handleSnap, removePlayer, restartGame };
