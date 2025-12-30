@@ -9,10 +9,18 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #2c3e50; /* Dark Blue-Grey background for modern look */
+    background-color: #2c3e50;
     color: white;
-    height: 100vh; /* Full screen height */
-    overflow: hidden; /* Prevent scrolling */
+    
+    /* Mobile Fixes */
+    height: 100vh;
+    height: 100dvh; /* Dynamic Viewport Height (fixes mobile browser bar issues) */
+    width: 100vw;
+    overflow: hidden; /* No scrolling allowed */
+    
+    /* Support for iPhone Notch (Safe Area) */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* 2. Main Game Layout */
@@ -416,4 +424,96 @@ input[type="text"] {
     border-color: #27ae60;
     transform: scale(1.1);
     box-shadow: 0 0 10px rgba(39, 174, 96, 0.5);
+}
+
+
+
+/* =========================================
+   📱 MOBILE RESPONSIVENESS
+   ========================================= */
+
+/* 1. Prevent Text Selection & Blue Highlights on Tap */
+* {
+    -webkit-tap-highlight-color: transparent; /* Remove blue flash on Android/iOS */
+    user-select: none; /* Prevent text selection when tapping fast */
+}
+
+/* 2. Adjust for Phones (Screens smaller than 600px) */
+@media screen and (max-width: 600px) {
+
+    /* LOBBY: Shrink the giant title */
+    .lobby-container h1 {
+        font-size: 2.5rem; /* Down from 4rem */
+    }
+
+    .code-display {
+        font-size: 2rem;
+        padding: 10px 20px;
+    }
+
+    /* GAME BOARD: Tweak Layout */
+    .player-zone {
+        height: 30%; /* Give players slightly more room */
+    }
+
+    .center-zone {
+        height: 40%;
+    }
+
+    /* CARDS: Shrink them to fit */
+    .card, .pile-slot {
+        width: 80px;  /* Down from 100px */
+        height: 120px; /* Down from 150px */
+    }
+
+    /* INFO TEXT: Make it readable but smaller */
+    .player-info {
+        font-size: 1rem;
+    }
+
+    .name {
+        display: block; /* Force name to own line */
+        font-size: 1.2rem;
+    }
+
+    /* SNAP BUTTON: Ensure it's reachable */
+    .snap-button {
+        padding: 10px 30px;
+        font-size: 1.5rem;
+    }
+
+    /* MENU: Make the modal wider on mobile */
+    .modal-content {
+        width: 85%;
+    }
+    
+    /* MENU BUTTON: Move it slightly so it doesn't overlap text */
+    .menu-toggle {
+        top: 10px;
+        right: 10px;
+        padding: 8px 12px;
+    }
+}
+
+/* 3. Handle Landscape Mode (Force user to rotate phone) */
+/* Games like this are hard to play in landscape on phones */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    #game-screen {
+        display: none !important;
+    }
+    
+    /* Show a "Please Rotate" message */
+    body::after {
+        content: "🔄 Please Rotate Your Device to Portrait Mode";
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: #2c3e50;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5rem;
+        text-align: center;
+        z-index: 9999;
+    }
 }
