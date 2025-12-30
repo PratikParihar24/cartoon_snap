@@ -728,3 +728,20 @@ input:focus { border-color: var(--secondary); }
 #alert-modal {
     z-index: 3000; /* Highest priority */
 }
+
+/* FIXED CARD BACK STYLE */
+.card.back {
+    /* 1. Force the default image via CSS */
+    background-image: url('/assets/backs/default.png'); 
+    
+    /* 2. Positioning */
+    background-size: cover;
+    background-position: center;
+    
+    /* 3. Fallback color (Red) so it's never just white */
+    background-color: #FF6B6B; 
+    
+    /* 4. Ensure it looks like a card */
+    border: 4px solid white;
+    border-radius: 12px;
+}
