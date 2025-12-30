@@ -236,19 +236,46 @@ function finishGame(io, roomId, winnerId, loserId) {
 }
 
 
-// Add this new function to gamelogic.js
-function restartGame(io, roomId) {
+// server/gamelogic.js
+
+function restartGame(io, roomId, socketId) {
     const room = rooms[roomId];
-    if (!room) return;
 
-    console.log(`[RESTART] Room ${roomId} is restarting...`);
-    
-    // 1. Reuse existing StartGame logic
-    // This will reshuffle, redeal, and send 'game_start' events again
-    startGame(io, roomId);
+    // 1. SAFETY CHECK: If room is dead (server restarted), tell client
+    if (!room) {
+        console.log(`[ERROR] Room ${roomId} not found for restart.`);
+        io.to(socketId).emit('init_error', 'Room expired. Please create a new game.');
+        return;
+    }
 
-    // 2. Notify clients specifically that it was a restart (optional UI cleanup)
-    io.to(roomId).emit('game_restarted');
+    // 2. Initialize Votes (if missing)
+    if (!room.rematchVotes) {
+        room.rematchVotes = new Set();
+    }
+
+    // 3. Register the Vote
+    room.rematchVotes.add(socketId);
+    console.log(`[REMATCH] Room ${roomId}: Player ${socketId} voted. Total: ${room.rematchVotes.size}/2`);
+
+    // 4. CHECK CONSENSUS (Both players agreed?)
+    if (room.rematchVotes.size >= 2) {
+        console.log(`[REMATCH] Consensus reached! Restarting Room ${roomId}...`);
+        
+        // Reset votes for next time
+        room.rematchVotes.clear();
+
+        // A. Tell Clients "Success" (To close the Game Over modal)
+        io.to(roomId).emit('rematch_success');
+
+        // B. Actually restart the game logic
+        startGame(io, roomId); 
+    } else {
+        // 5. Only 1 person voted. Notify the OTHER player.
+        const otherPlayer = room.players.find(p => p.id !== socketId);
+        if (otherPlayer) {
+            io.to(otherPlayer.id).emit('opponent_wants_rematch');
+        }
+    }
 }
 
 // Ensure you export the same list as before!

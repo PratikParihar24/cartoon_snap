@@ -38,6 +38,13 @@ const resumeBtn = document.getElementById('resume-btn');
 const restartBtn = document.getElementById('restart-btn');
 const leaveBtn = document.getElementById('leave-btn');
 
+// --- GAME OVER MODAL ELEMENTS ---
+const gameOverModal = document.getElementById('game-over-modal');
+const winnerTitle = document.getElementById('winner-title');
+const winnerMessage = document.getElementById('winner-message');
+const rematchBtn = document.getElementById('rematch-btn');
+const exitBtn = document.getElementById('exit-btn');
+
 
 // --- Game Variables ---
 let myHand = [];
@@ -503,8 +510,95 @@ function showCustomAlert(title, message, callback) {
 }
 
 // Handle errors (like "Room Full" or "Game in Progress")
+// Handle Server Errors (Like "Room not found")
+// 3. Handle "Room Expired" Error (For server restarts)
 socket.on('init_error', (msg) => {
-    showCustomAlert("Error", msg, () => {
-        window.location.reload(); // Send them back to start
+    // Hide the game/modal so it doesn't look stuck
+    document.getElementById('game-over-modal').classList.add('hidden');
+    
+    // Show alert and reload
+    showCustomAlert("Connection Error", msg, () => {
+        window.location.reload(); 
     });
+});
+
+// --- GAME OVER LOGIC ---
+
+// 1. Rematch Button Click
+rematchBtn.addEventListener('click', () => {
+    playSound(audioFlip);
+    
+    // Disable button to prevent spam
+    rematchBtn.disabled = true;
+    rematchBtn.innerText = "⏳ Waiting for Opponent...";
+    rematchBtn.style.opacity = "0.7";
+    
+    // Tell server "I want a rematch"
+    socket.emit('request_restart', { roomId: currentRoomId });
+});
+
+// 2. Exit Button Click
+exitBtn.addEventListener('click', () => {
+    window.location.reload(); // Go back to lobby
+});
+
+// 3. Handle Game Over Event (Show the Modal)
+socket.on('game_over', (data) => {
+    isGameOver = true;
+    
+    // Who won?
+    const amIWinner = (socket.id === data.winnerId);
+    
+    if (amIWinner) {
+        playSound(audioWin);
+        fireConfetti();
+        winnerTitle.innerText = "🏆 VICTORY!";
+        winnerTitle.style.color = "#FFE66D"; // Gold
+        winnerMessage.innerText = "You are the Snap Champion!";
+    } else {
+        winnerTitle.innerText = "💀 DEFEAT";
+        winnerTitle.style.color = "#FF6B6B"; // Red
+        winnerMessage.innerText = "Better luck next time...";
+    }
+    
+    // Show Modal after small delay
+    setTimeout(() => {
+        gameOverModal.classList.remove('hidden');
+    }, 1000);
+});
+
+// 4. Handle "Opponent Wants Rematch" (Update Button)
+
+// 1. Handle "Opponent Waiting" (Update Button Color/Text)
+socket.on('opponent_wants_rematch', () => {
+    const btn = document.getElementById('rematch-btn');
+    btn.innerText = "⚠️ Opponent is waiting!";
+    btn.style.backgroundColor = "#e67e22"; // Orange
+    btn.classList.add('pulse');
+    showFlashMessage("Opponent wants rematch!");
+});
+
+// 2. Handle "Rematch Success" (Force Close Modal & Reset Button)
+socket.on('rematch_success', () => {
+    console.log("✅ Rematch Accepted! Resetting UI...");
+    
+    // A. Hide the Game Over Modal
+    document.getElementById('game-over-modal').classList.add('hidden');
+    
+    // B. Reset the Button for next time
+    const btn = document.getElementById('rematch-btn');
+    btn.innerText = "🔄 Rematch";
+    btn.disabled = false;
+    btn.style.backgroundColor = "";
+    btn.classList.remove('pulse');
+
+    // C. Show Feedback
+    showFlashMessage("GAME START!");
+});
+
+// 6. Handle Standard Restart (Mid-game)
+socket.on('game_restarted', () => {
+    // Also hide modal just in case
+    gameOverModal.classList.add('hidden');
+    showFlashMessage("RESTART!");
 });

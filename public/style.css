@@ -745,3 +745,20 @@ input:focus { border-color: var(--secondary); }
     border: 4px solid white;
     border-radius: 12px;
 }
+
+/* GAME OVER MODAL */
+#game-over-modal {
+    z-index: 1500; /* Above game (100), below alerts (2000) */
+    backdrop-filter: blur(5px); /* Blurs the background game */
+}
+
+/* Rematch Button Pulse Animation (Optional) */
+@keyframes pulse-orange {
+    0% { box-shadow: 0 0 0 0 rgba(230, 126, 34, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(230, 126, 34, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(230, 126, 34, 0); }
+}
+
+.pulse {
+    animation: pulse-orange 1.5s infinite;
+}

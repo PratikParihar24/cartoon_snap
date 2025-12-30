@@ -57,7 +57,7 @@ io.on('connection', (socket) => {
     // Handle Restart Request
     socket.on('request_restart', (data) => {
         if (data && data.roomId) {
-            restartGame(io, data.roomId);
+            restartGame(io, data.roomId, socket.id);
         }
     });
 
