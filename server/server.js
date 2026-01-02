@@ -55,11 +55,12 @@ io.on('connection', (socket) => {
     });
 
     // Handle Restart Request
-    socket.on('request_restart', (data) => {
-        if (data && data.roomId) {
-            restartGame(io, data.roomId, socket.id);
-        }
-    });
+   socket.on('request_restart', (data) => {
+    if (data && data.roomId) {
+        // ⚠️ CRITICAL: Must pass 'socket.id' as the 3rd argument
+        restartGame(io, data.roomId, socket.id);
+    }
+});
 
     // C. DISCONNECT
     // -------------------------------------------------

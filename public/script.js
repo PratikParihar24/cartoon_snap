@@ -161,6 +161,10 @@ socket.on('game_start', (data) => {
 socket.on('game_start', (data) => {
     console.log("Game Started!", data);
 
+    // Force hide modals just in case 'rematch_success' missed it
+    document.getElementById('game-over-modal').classList.add('hidden');
+    document.getElementById('menu-modal').classList.add('hidden');
+
     // 1. Identify Opponent
     const opponent = data.players.find(p => p.id !== socket.id);
     const me = data.players.find(p => p.id === socket.id);
@@ -583,6 +587,7 @@ socket.on('game_over', (data) => {
 
 // 4. Handle "Opponent Wants Rematch" (Update Button)
 
+// 1. Handle "Opponent Waiting" (Update Button Color/Text)
 // 1. Handle "Opponent Waiting" (Update Button Color/Text)
 socket.on('opponent_wants_rematch', () => {
     const btn = document.getElementById('rematch-btn');
