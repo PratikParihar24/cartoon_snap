@@ -887,3 +887,46 @@ input:focus { border-color: var(--secondary); }
     from { transform: scale(1); opacity: 0.9; }
     to { transform: scale(1.05); opacity: 1; }
 }
+
+/* EDGE CASE 1: Force Portrait Mode */
+#landscape-warning {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--bg-color);
+    z-index: 99999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Only show this if width > height (Landscape) on mobile devices */
+@media screen and (max-width: 900px) and (orientation: landscape) {
+    #landscape-warning { display: flex; }
+    #game-screen, #lobby-screen { display: none !important; }
+}
+
+/* EDGE CASE 2: Safe Text Handling */
+.info-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    
+    /* ADD THESE LINES */
+    max-width: 100px;  /* Force a limit */
+    overflow: hidden;  /* Hide overflow */
+}
+
+.name {
+    color: var(--accent);
+    font-size: 1rem;
+    letter-spacing: 1px;
+    
+    /* ADD THESE LINES */
+    white-space: nowrap;      /* Don't wrap to new line */
+    text-overflow: ellipsis;  /* Add "..." at the end */
+    width: 100%;              /* Take available space */
+    display: block;
+}
