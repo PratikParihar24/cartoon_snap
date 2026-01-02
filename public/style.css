@@ -888,6 +888,21 @@ input:focus { border-color: var(--secondary); }
     to { transform: scale(1.05); opacity: 1; }
 }
 
+/* URGENT NOTIFICATION PULSE */
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
+    70% { box-shadow: 0 0 0 15px rgba(255, 107, 107, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); }
+}
+
+.pulse-red {
+    animation: pulse-red 1.5s infinite;
+    border-color: #FF6B6B !important;
+    color: #FF6B6B !important;
+}
+
+
+
 /* EDGE CASE 1: Force Portrait Mode */
 #landscape-warning {
     display: none; /* Hidden by default */
@@ -930,3 +945,4 @@ input:focus { border-color: var(--secondary); }
     width: 100%;              /* Take available space */
     display: block;
 }
+

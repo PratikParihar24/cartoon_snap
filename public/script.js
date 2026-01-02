@@ -422,8 +422,12 @@ function getCardImage(style, character) {
 // ========================================================
 
 // 1. Toggle Menu
+// 1. Toggle Menu
 menuBtn.addEventListener('click', () => {
     menuModal.classList.remove('hidden');
+    
+    // NEW: Stop the urgent pulsing when they open the menu
+    menuBtn.classList.remove('pulse-red');
 });
 
 resumeBtn.addEventListener('click', () => {
@@ -645,12 +649,33 @@ socket.on('game_over', (data) => {
 
 // 1. Handle "Opponent Waiting" (Update Button Color/Text)
 // 1. Handle "Opponent Waiting" (Update Button Color/Text)
+// 1. Handle "Opponent Waiting"
 socket.on('opponent_wants_rematch', () => {
-    const btn = document.getElementById('rematch-btn');
-    btn.innerText = "⚠️ Opponent is waiting!";
-    btn.style.backgroundColor = "#e67e22"; // Orange
-    btn.classList.add('pulse');
-    showFlashMessage("Opponent wants rematch!");
+    // A. Show the Flash Message (Brief Alert)
+    showFlashMessage("Opponent wants restart!");
+
+    // B. Update Status Text (PERSISTENT INDICATOR)
+    // This stays on screen until they click or play
+    statusMsg.innerText = "⚠️ Opponent wants Restart!";
+    statusMsg.className = "status-message status-match"; // Reuse the 'Match' style (Red/Big)
+    statusMsg.style.fontSize = "1.2rem"; // Make it fit nicely
+
+    // C. Highlight the Menu Button (Guide them where to click)
+    const menuBtn = document.getElementById('menu-btn');
+    menuBtn.classList.add('pulse-red');
+
+    // D. Update the Button inside the Menu
+    const menuRestartBtn = document.getElementById('restart-btn');
+    menuRestartBtn.innerText = "⚠️ Accept Restart";
+    menuRestartBtn.style.backgroundColor = "#e67e22"; // Orange
+
+    // E. Update the Button inside Game Over Modal (If open)
+    const gameOverRematchBtn = document.getElementById('rematch-btn');
+    if (gameOverRematchBtn) {
+        gameOverRematchBtn.innerText = "⚠️ Opponent is waiting!";
+        gameOverRematchBtn.style.backgroundColor = "#e67e22";
+        gameOverRematchBtn.classList.add('pulse');
+    }
 });
 
 // 2. Handle "Rematch Success" (Force Close Modal & Reset Button)
