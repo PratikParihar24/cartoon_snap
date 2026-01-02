@@ -20,7 +20,7 @@ const statusMsg = document.getElementById('game-status');
 const myDeck = document.getElementById('my-deck');
 const centerPile = document.getElementById('center-pile');
 const snapBtn = document.getElementById('snap-btn');
-const roomDisplay = document.getElementById('room-display'); // New!
+
 
 // --- NEW WAITING ROOM DOM ELEMENTS ---
 const usernameInput = document.getElementById('username-input');

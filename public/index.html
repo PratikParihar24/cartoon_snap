@@ -57,53 +57,7 @@
 
     <div id="game-screen" class="game-board hidden">
 
-        <div id="flash-message" class="flash-overlay hidden">
-            <div class="flash-content">
-                <h1 id="flash-text">SNAP!</h1>
-            </div>
-        </div>
-
-        <div id="alert-modal" class="modal-overlay hidden">
-            <div class="modal-content">
-                <h2 id="alert-title">Notice</h2>
-                <p id="alert-msg" style="margin: 15px 0; font-size: 1.2rem;">Something happened.</p>
-                <button id="alert-btn" class="main-btn">OK</button>
-            </div>
-        </div>
-
-        <div id="game-over-modal" class="modal-overlay hidden">
-            <div class="modal-content">
-                <h2 id="winner-title" style="font-size: 3rem; margin-bottom: 10px;">GAME OVER</h2>
-                <p id="winner-message" style="font-size: 1.2rem; margin-bottom: 25px;">...</p>
-                
-                <button id="rematch-btn" class="main-btn">🔄 Rematch</button>
-                <button id="exit-btn" class="menu-item danger">🚪 Exit to Lobby</button>
-            </div>
-        </div>
-
         <button id="menu-btn" class="menu-toggle">☰</button>
-
-        <div id="menu-modal" class="modal-overlay hidden">
-            <div class="modal-content">
-                <h2>Game Menu</h2>
-                <button id="resume-btn" class="menu-item">▶ Resume Game</button>
-                <button id="sound-btn" class="menu-item">🔊 Sound: ON</button>
-                
-                <div class="skin-selector">
-                    <h3>Card Style</h3>
-                    <div class="skin-options">
-                        <img src="/assets/backs/default.png" data-skin="default" class="skin-option selected">
-                        <img src="/assets/backs/blue.png" data-skin="blue" class="skin-option">
-                        <img src="/assets/backs/modern.png" data-skin="modern" class="skin-option">
-                    </div>
-                </div>
-                
-                <hr style="margin: 15px 0; opacity: 0.2;">
-
-                <button id="restart-btn" class="menu-item">🔄 Restart Game</button>
-                <button id="leave-btn" class="menu-item danger">🚪 Leave Room</button>
-            </div>
-        </div>
 
         <div class="player-zone" id="opponent-zone">
             <div class="player-info">
@@ -119,15 +73,16 @@
         </div>
 
         <div class="center-zone">
-            <div id="room-display" style="position: absolute; top: 10px; opacity: 0.5;">Room: ???</div>
 
             <div id="game-status" class="status-message">Waiting...</div>
 
-            <div id="center-pile" class="pile-slot">
-                <div class="placeholder-text">Center Pile</div>
+            <div class="snap-container">
+                <div id="center-pile" class="pile-slot">
+                    <div class="placeholder-text">Center Pile</div>
+                </div>
+                
+                <button id="snap-btn" class="snap-button hidden">SNAP! ⚡</button>
             </div>
-            
-            <button id="snap-btn" class="snap-button hidden">SNAP! ⚡</button>
         </div>
 
         <div class="player-zone" id="player-zone">
@@ -144,6 +99,53 @@
         </div>
 
     </div>
+
+    <div id="flash-message" class="flash-overlay hidden">
+        <div class="flash-content">
+            <h1 id="flash-text">SNAP!</h1>
+        </div>
+    </div>
+
+    <div id="alert-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 id="alert-title">Notice</h2>
+            <p id="alert-msg" style="margin: 15px 0; font-size: 1.2rem;">Something happened.</p>
+            <button id="alert-btn" class="main-btn">OK</button>
+        </div>
+    </div>
+
+    <div id="game-over-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 id="winner-title" style="font-size: 3rem; margin-bottom: 10px;">GAME OVER</h2>
+            <p id="winner-message" style="font-size: 1.2rem; margin-bottom: 25px;">...</p>
+            
+            <button id="rematch-btn" class="main-btn">🔄 Rematch</button>
+            <button id="exit-btn" class="menu-item danger">🚪 Exit to Lobby</button>
+        </div>
+    </div>
+
+    <div id="menu-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2>Game Menu</h2>
+            <button id="resume-btn" class="menu-item">▶ Resume Game</button>
+            <button id="sound-btn" class="menu-item">🔊 Sound: ON</button>
+            
+            <div class="skin-selector">
+                <h3>Card Style</h3>
+                <div class="skin-options">
+                    <img src="/assets/backs/default.png" data-skin="default" class="skin-option selected">
+                    <img src="/assets/backs/blue.png" data-skin="blue" class="skin-option">
+                    <img src="/assets/backs/modern.png" data-skin="modern" class="skin-option">
+                </div>
+            </div>
+            
+            <hr style="margin: 15px 0; opacity: 0.2;">
+
+            <button id="restart-btn" class="menu-item">🔄 Restart Game</button>
+            <button id="leave-btn" class="menu-item danger">🚪 Leave Room</button>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="script.js"></script> 
