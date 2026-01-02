@@ -774,3 +774,21 @@ input:focus { border-color: var(--secondary); }
 #game-over-modal.hidden {
     display: none !important;
 }
+
+/* =========================================
+   PHASE 6: NEW ANIMATIONS (Added for V2)
+   ========================================= */
+
+/* The "Invalid Move" Shake */
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px) rotate(-5deg); }
+    50% { transform: translateX(5px) rotate(5deg); }
+    75% { transform: translateX(-5px) rotate(-5deg); }
+    100% { transform: translateX(0); }
+}
+
+.shake-anim {
+    animation: shake 0.4s ease-in-out;
+    border-color: #FF6B6B !important; /* Flash red border */
+}

@@ -70,6 +70,15 @@ function playSound(sound) {
     }
 }
 
+// --- HELPER: Trigger CSS Animation ---
+function triggerShake(element) {
+    element.classList.remove('shake-anim'); // Reset
+    void element.offsetWidth; // Force Reflow (Magic trick to restart animation)
+    element.classList.add('shake-anim'); // Apply
+    
+    // Play a dull "thud" sound if you have one, or just silent visual feedback
+}
+
 // ========================================================
 // A. LOBBY LOGIC (NEW)
 // ========================================================
@@ -77,8 +86,11 @@ function playSound(sound) {
 // 1. Create Game
 createBtn.addEventListener('click', () => {
     const name = usernameInput.value.trim();
-    if (!name) { alert("Please enter your name!"); return; }
-
+    // REPLACEMENT 1: Custom Modal
+    if (!name) { 
+        showCustomAlert("Missing Name", "Please enter your name to create a room!"); 
+        return; 
+    }
     console.log("Creating room as " + name);
     // V2 Update: Send name along with request
     socket.emit('create_room', { name: name });
@@ -89,9 +101,15 @@ joinBtn.addEventListener('click', () => {
     const name = usernameInput.value.trim();
     const code = roomInput.value.trim().toUpperCase();
 
-    if (!name) { alert("Please enter your name!"); return; }
-    if (!code) { alert("Please enter a Room Code!"); return; }
-
+    // REPLACEMENT 2: Custom Modal
+    if (!name) { 
+        showCustomAlert("Missing Name", "Please enter your name to join!"); 
+        return; 
+    }
+    if (!code) { 
+        showCustomAlert("Missing Code", "Please enter a 6-letter Room Code!"); 
+        return; 
+    }
     console.log(`Joining room ${code} as ${name}`);
     // V2 Update: Send name along with request
     socket.emit('join_room', { roomId: code, name: name });
@@ -204,16 +222,30 @@ socket.on('game_start', (data) => {
 // 2. User Plays a Card
 myDeck.addEventListener('click', () => {
     if (isGameOver) return; 
+    // REPLACEMENT 3: If it's a match, don't alert. 
+    // Just shake the SNAP button to tell them "CLICK ME!"
     if (isMatchActive) {
-        alert("IT'S A MATCH! CLICK THE SNAP BUTTON!");
+        triggerShake(snapBtn); 
+        showFlashMessage("CLICK SNAP! 👇");
         return;
     }
+
+    // REPLACEMENT 4: Shake the deck if it's not their turn
     if (!isMyTurn) {
-        alert("Wait for your turn!"); 
+        triggerShake(myDeck);
+        // Optional: Updates status text briefly
+        const oldText = statusMsg.innerText;
+        statusMsg.innerText = "❌ WAIT YOUR TURN!";
+        statusMsg.style.color = "#FF6B6B";
+        setTimeout(() => {
+            statusMsg.innerText = oldText;
+            statusMsg.style.color = "white";
+        }, 1000);
         return; 
     }
+
     if (myHand.length === 0) {
-        alert("You have no cards left!");
+        // No alert needed here, the Game Over event handles this
         return;
     }
 

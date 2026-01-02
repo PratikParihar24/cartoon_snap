@@ -72,6 +72,7 @@ function joinRoom(socket, io, roomId, playerName) {
 function startGame(io, roomId) {
     const room = rooms[roomId];
     room.gameStatus = 'ACTIVE';
+    room.centerPile = [];
 
     // ... (Deck shuffling logic is same) ...
     const gameDeck = new Deck();
@@ -232,7 +233,10 @@ function finishGame(io, roomId, winnerId, loserId) {
         winnerId: winnerId,
         loserId: loserId
     });
-    delete rooms[roomId]; // Cleanup
+    
+    // We DO NOT delete the room here anymore.
+    // We keep it alive so players can click "Rematch".
+    // The room will be deleted when they disconnect (close the tab).
 }
 
 
