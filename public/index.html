@@ -58,28 +58,28 @@
     <div id="game-screen" class="game-board hidden">
 
         <div id="flash-message" class="flash-overlay hidden">
-    <div class="flash-content">
-        <h1 id="flash-text">SNAP!</h1>
-    </div>
-</div>
+            <div class="flash-content">
+                <h1 id="flash-text">SNAP!</h1>
+            </div>
+        </div>
 
-<div id="alert-modal" class="modal-overlay hidden">
-    <div class="modal-content">
-        <h2 id="alert-title">Notice</h2>
-        <p id="alert-msg" style="margin: 15px 0; font-size: 1.2rem;">Something happened.</p>
-        <button id="alert-btn" class="main-btn">OK</button>
-    </div>
-</div>
+        <div id="alert-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <h2 id="alert-title">Notice</h2>
+                <p id="alert-msg" style="margin: 15px 0; font-size: 1.2rem;">Something happened.</p>
+                <button id="alert-btn" class="main-btn">OK</button>
+            </div>
+        </div>
 
-<div id="game-over-modal" class="modal-overlay hidden">
-    <div class="modal-content">
-        <h2 id="winner-title" style="font-size: 3rem; margin-bottom: 10px;">GAME OVER</h2>
-        <p id="winner-message" style="font-size: 1.2rem; margin-bottom: 25px;">...</p>
-        
-        <button id="rematch-btn" class="main-btn">🔄 Rematch</button>
-        <button id="exit-btn" class="menu-item danger">🚪 Exit to Lobby</button>
-    </div>
-</div>
+        <div id="game-over-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <h2 id="winner-title" style="font-size: 3rem; margin-bottom: 10px;">GAME OVER</h2>
+                <p id="winner-message" style="font-size: 1.2rem; margin-bottom: 25px;">...</p>
+                
+                <button id="rematch-btn" class="main-btn">🔄 Rematch</button>
+                <button id="exit-btn" class="menu-item danger">🚪 Exit to Lobby</button>
+            </div>
+        </div>
 
         <button id="menu-btn" class="menu-toggle">☰</button>
 
@@ -105,16 +105,14 @@
             </div>
         </div>
 
-        
-
         <div class="player-zone" id="opponent-zone">
             <div class="player-info">
-    <img id="opp-avatar" src="" class="avatar-img hidden">
-    <div class="info-text">
-        <span class="name" id="opp-name-display">Opponent</span>
-        <span class="card-count">Cards: <span id="opp-count">26</span></span>
-    </div>
-</div>
+                <img id="opp-avatar" src="" class="avatar-img hidden">
+                <div class="info-text">
+                    <span class="name" id="opp-name-display">Opponent</span>
+                    <span class="card-count">Cards: <span id="opp-count">26</span></span>
+                </div>
+            </div>
             <div class="deck-container">
                 <div class="card back"></div> 
             </div>
@@ -123,12 +121,13 @@
         <div class="center-zone">
             <div id="room-display" style="position: absolute; top: 10px; opacity: 0.5;">Room: ???</div>
 
+            <div id="game-status" class="status-message">Waiting...</div>
+
             <div id="center-pile" class="pile-slot">
                 <div class="placeholder-text">Center Pile</div>
             </div>
             
             <button id="snap-btn" class="snap-button hidden">SNAP! ⚡</button>
-            <div id="game-status" class="status-message">Waiting...</div>
         </div>
 
         <div class="player-zone" id="player-zone">
@@ -136,12 +135,12 @@
                 <div class="card back"></div> 
             </div>
             <div class="player-info">
-    <img id="my-avatar" src="" class="avatar-img hidden">
-    <div class="info-text">
-        <span class="name" id="my-name-display">YOU</span>
-        <span class="card-count">Cards: <span id="my-count">26</span></span>
-    </div>
-</div>
+                <img id="my-avatar" src="" class="avatar-img hidden">
+                <div class="info-text">
+                    <span class="name" id="my-name-display">YOU</span>
+                    <span class="card-count">Cards: <span id="my-count">26</span></span>
+                </div>
+            </div>
         </div>
 
     </div>

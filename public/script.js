@@ -79,6 +79,36 @@ function triggerShake(element) {
     // Play a dull "thud" sound if you have one, or just silent visual feedback
 }
 
+// --- HELPER: ENGAGING UI UPDATES ---
+const myPhrases = ["YOUR TURN!", "GO GO GO!", "YOUR MOVE!", "DROP IT!", "PLAY NOW!"];
+const oppPhrases = ["Opponent Thinking...", "Waiting...", "Opponent's Move", "Hurry up..."];
+
+function updateTurnUI(isMine, isMatch) {
+    // 1. Handle MATCH State (Highest Priority)
+    if (isMatch) {
+        statusMsg.innerText = "🔥 SNAP! CLICK IT! 🔥";
+        statusMsg.className = "status-message status-match"; // Apply CSS
+        myDeck.style.border = "4px solid #FF6B6B"; // Red Border
+        return;
+    }
+
+    // 2. Handle MY TURN
+    if (isMine) {
+        // Pick a random fun phrase
+        const randomText = myPhrases[Math.floor(Math.random() * myPhrases.length)];
+        statusMsg.innerText = randomText;
+        statusMsg.className = "status-message status-mine"; // Apply CSS
+        myDeck.style.border = "4px solid #FFE66D"; // Yellow Border
+    } 
+    // 3. Handle OPPONENT TURN
+    else {
+        const randomText = oppPhrases[Math.floor(Math.random() * oppPhrases.length)];
+        statusMsg.innerText = randomText;
+        statusMsg.className = "status-message status-opp"; // Apply CSS
+        myDeck.style.border = "2px solid rgba(255,255,255,0.2)"; // Dim Border
+    }
+}
+
 // ========================================================
 // A. LOBBY LOGIC (NEW)
 // ========================================================
@@ -162,13 +192,8 @@ socket.on('game_start', (data) => {
     myCountDisplay.innerText = myHand.length; 
     oppCountDisplay.innerText = data.opponentCardCount; 
     
-    if (isMyTurn) {
-        statusMsg.innerText = "YOUR TURN";
-        myDeck.style.border = "4px solid yellow";
-    } else {
-        statusMsg.innerText = "Opponent's Turn";
-        myDeck.style.border = "2px solid white";
-    }
+    // REPLACE THE OLD IF/ELSE BLOCK WITH THIS:
+    updateTurnUI(isMyTurn, false);
 });
 
 // ========================================================
@@ -254,14 +279,12 @@ myDeck.addEventListener('click', () => {
 });
 
 // 3. Server Updates Board
+// 3. Server Updates Board (Card Played)
 socket.on('card_played', (data) => {
-
     playSound(audioFlip);
 
-
-    // A. Show the Card (UPDATED FOR IMAGES)
+    // A. Show the Card
     const imagePath = getCardImage(data.card.style, data.card.character);
-    
     centerPile.innerHTML = `
         <div class="card face-up">
             <img src="${imagePath}" alt="${data.card.character}" class="card-img">
@@ -277,26 +300,31 @@ socket.on('card_played', (data) => {
         }
     });
 
-    // C. Handle Match & Turn
-    if (data.isMatch) {
-        snapBtn.classList.remove('hidden');
-        statusMsg.innerText = "🔥 SNAP! CLICK THE BUTTON! 🔥";
-        statusMsg.style.color = "#ffcc00";
-        isMatchActive = true;
+    // C. Handle Turn & Match Logic
+    // 1. First, determine whose turn it is
+    if (data.turn === socket.id) {
+        isMyTurn = true;
     } else {
-        snapBtn.classList.add('hidden');
-        statusMsg.style.color = "white";
-        isMatchActive = false;
+        isMyTurn = false;
+    }
 
-        if (data.turn === socket.id) {
-            isMyTurn = true;
-            statusMsg.innerText = "YOUR TURN";
-            myDeck.style.border = "4px solid yellow";
-        } else {
-            isMyTurn = false;
-            statusMsg.innerText = "Opponent's Turn";
-            myDeck.style.border = "2px solid white";
-        }
+    // 2. NOW, check for match and update UI
+    if (data.isMatch) {
+        // --- IT IS A MATCH! ---
+        snapBtn.classList.remove('hidden'); // Show Button
+        isMatchActive = true;
+        updateTurnUI(null, true); // Force "SNAP!" text
+        
+        // Trigger shake immediately to grab attention
+        triggerShake(snapBtn); 
+        
+    } else {
+        // --- NORMAL PLAY (No Match) ---
+        snapBtn.classList.add('hidden'); // Hide Button
+        isMatchActive = false;
+        
+        // CRITICAL FIX: Reset the text to "Your Turn" or "Waiting"
+        updateTurnUI(isMyTurn, false); 
     }
 });
 
@@ -320,27 +348,23 @@ socket.on('snap_success', (data) => {
 });
 
 // 6. Game Updates (Counts)
+// 6. Game Updates (Counts & Turns)
 socket.on('game_update', (data) => {
-    if (socket.id === data.turn) {
-        isMyTurn = true;
-        statusMsg.innerText = "YOUR TURN";
-        myDeck.style.border = "4px solid yellow";
-    } else {
-        isMyTurn = false;
-        statusMsg.innerText = "Opponent's Turn";
-        myDeck.style.border = "2px solid white";
-    }
+    // 1. Update Turn Logic (Concise & Clean)
+    isMyTurn = (socket.id === data.turn);
+    
+    // 2. Update UI (New Engaging Text/Colors)
+    updateTurnUI(isMyTurn, false);
 
+    // 3. Update Card Counts
     data.players.forEach(player => {
         if (player.id === socket.id) {
             myCountDisplay.innerText = player.count;
-            if (player.count === 0) alert("GAME OVER! You Lose!");
         } else {
             oppCountDisplay.innerText = player.count;
         }
     });
 });
-
 // 7 : game over
 
 socket.on('game_over', (data) => {
