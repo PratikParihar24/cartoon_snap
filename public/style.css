@@ -762,3 +762,15 @@ input:focus { border-color: var(--secondary); }
 .pulse {
     animation: pulse-orange 1.5s infinite;
 }
+
+/* FORCE GAME OVER VISIBILITY */
+#game-over-modal {
+    display: flex !important; /* Forces it to use Flexbox layout */
+    z-index: 9999 !important; /* Forces it to be on top of EVERYTHING */
+    background: rgba(43, 46, 74, 0.95); /* Dark background */
+}
+
+/* BUT... hide it when the 'hidden' class is present */
+#game-over-modal.hidden {
+    display: none !important;
+}

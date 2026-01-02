@@ -308,24 +308,38 @@ socket.on('game_update', (data) => {
 // 7 : game over
 
 socket.on('game_over', (data) => {
-    // 1. Determine who won
+    console.log("💀 GAME OVER EVENT RECEIVED"); // Check console for this
+    isGameOver = true;
+    
+    // 1. Determine Winner
     const amIWinner = (socket.id === data.winnerId);
     
+    // 2. Set Text
     if (amIWinner) {
         playSound(audioWin);
-        fireConfetti(); // Celebration!
-        showFlashMessage("🏆 VICTORY! 🏆");
+        fireConfetti();
+        winnerTitle.innerText = "🏆 VICTORY!";
+        winnerTitle.style.color = "#FFE66D";
+        winnerMessage.innerText = "You are the Snap Champion!";
     } else {
-        showFlashMessage("💀 DEFEAT 💀");
+        winnerTitle.innerText = "💀 DEFEAT";
+        winnerTitle.style.color = "#FF6B6B";
+        winnerMessage.innerText = "Better luck next time...";
     }
-
-    // 2. Reset UI for next round
-    centerPile.innerHTML = `<div class="placeholder-text">Game Over</div>`;
-    snapBtn.classList.add('hidden');
-    isMatchActive = false;
-    isGameOver = true;
+    
+    // 3. FORCE SHOW MODAL
+    setTimeout(() => {
+        console.log("🕒 Showing Modal Now..."); // Check console for this
+        const modal = document.getElementById('game-over-modal');
+        
+        if (modal) {
+            modal.classList.remove('hidden');
+            console.log("✅ Modal class list:", modal.classList.value);
+        } else {
+            console.error("❌ ERROR: Could not find element #game-over-modal");
+        }
+    }, 1000);
 });
-
 
 
 
