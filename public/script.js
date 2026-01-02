@@ -204,6 +204,41 @@ socket.on('game_start', (data) => {
 socket.on('game_start', (data) => {
     console.log("Game Started!", data);
 
+    // --- 🛑 FIX: RESET GAME STATE FLAGS ---
+    isGameOver = false;      // Unlock the deck!
+    isMatchActive = false;   // Reset match status
+    snapBtn.classList.add('hidden'); // Hide button if it was stuck open
+    // Reset Center Pile UI (Clear old cards)
+    centerPile.innerHTML = `<div class="placeholder-text">Center Pile</div>`;
+    // -------------------------------------
+
+    // ... (previous reset code) ...
+
+    // --- 🛑 NEW: RESET UI ARTIFACTS (Fixes the stuck menu button) ---
+    
+    // 1. Reset the Menu "Restart" Button (Blue & Default Text)
+    const menuRestartBtn = document.getElementById('restart-btn');
+    menuRestartBtn.innerText = "🔄 Restart Game";
+    menuRestartBtn.style.backgroundColor = ""; // Removes the orange warning color
+    menuRestartBtn.classList.remove('pulse');
+
+    // 2. Stop the Menu Icon from pulsing red (if it was)
+    const menuIcon = document.getElementById('menu-btn');
+    menuIcon.classList.remove('pulse-red');
+
+    // 3. Reset the Game Over Modal Button (Just in case)
+    const goRematchBtn = document.getElementById('rematch-btn');
+    if (goRematchBtn) {
+        goRematchBtn.innerText = "🔄 Rematch";
+        goRematchBtn.style.backgroundColor = "";
+        goRematchBtn.disabled = false;
+        goRematchBtn.style.opacity = "1";
+    }
+
+    // Force hide modals just in case
+    document.getElementById('game-over-modal').classList.add('hidden');
+    document.getElementById('menu-modal').classList.add('hidden');
+
     // Force hide modals just in case 'rematch_success' missed it
     document.getElementById('game-over-modal').classList.add('hidden');
     document.getElementById('menu-modal').classList.add('hidden');
@@ -336,6 +371,20 @@ snapBtn.addEventListener('click', () => {
     snapBtn.classList.add('hidden');
 });
 
+// NEW: Clicking the Center Pile also attempts a SNAP
+// This allows for "Spam Penalties" if they click it when there is no match.
+centerPile.addEventListener('click', () => {
+    // 1. Safety Check: Game must be running
+    if (isGameOver || !currentRoomId) return;
+
+    // 2. Visual Feedback: Shake the pile slightly to show it registered
+    triggerShake(centerPile);
+
+    // 3. Send the Attempt (Server handles the penalty logic)
+    console.log("🔴 PILE CLICKED (Snap Attempt)!");
+    socket.emit('snap_attempt', { roomId: currentRoomId });
+});
+
 // 5. Handle Snap Success
 socket.on('snap_success', (data) => {
     playSound(audioSnap);
@@ -422,7 +471,6 @@ function getCardImage(style, character) {
 // ========================================================
 
 // 1. Toggle Menu
-// 1. Toggle Menu
 menuBtn.addEventListener('click', () => {
     menuModal.classList.remove('hidden');
     
@@ -430,8 +478,14 @@ menuBtn.addEventListener('click', () => {
     menuBtn.classList.remove('pulse-red');
 });
 
+// 5. Ensure Menu Resets when closed via Resume
 resumeBtn.addEventListener('click', () => {
     menuModal.classList.add('hidden');
+    // Reset views just in case they open it again later
+    setTimeout(() => {
+        menuConfirmView.classList.add('hidden');
+        menuMainView.classList.remove('hidden');
+    }, 300);
 });
 
 // 2. Restart Game (Reset Deck for both players)
@@ -442,17 +496,29 @@ restartBtn.addEventListener('click', () => {
 });
 
 // 3. Leave Room (Go back to Lobby)
+// --- MENU LOGIC UPDATES ---
+
+// 1. Get New Elements
+const menuMainView = document.getElementById('menu-main-view');
+const menuConfirmView = document.getElementById('menu-confirm-view');
+const confirmLeaveYes = document.getElementById('confirm-leave-yes');
+const confirmLeaveNo = document.getElementById('confirm-leave-no');
+
+// 2. Handle "Leave Room" Click -> Show Confirmation
 leaveBtn.addEventListener('click', () => {
-    // 🚫 Replaced standard confirm() with Custom Modal
-    
-    showCustomAlert(
-        "Leave Game?", 
-        "Are you sure you want to quit? You will lose your progress.", 
-        () => {
-            // This code runs only if they click "OK"
-            window.location.reload(); 
-        }
-    );
+    menuMainView.classList.add('hidden');   // Hide Normal Menu
+    menuConfirmView.classList.remove('hidden'); // Show Confirm View
+});
+
+// 3. Handle "No, Go Back" -> Restore Normal Menu
+confirmLeaveNo.addEventListener('click', () => {
+    menuConfirmView.classList.add('hidden'); // Hide Confirm View
+    menuMainView.classList.remove('hidden'); // Show Normal Menu
+});
+
+// 4. Handle "Yes, Leave" -> Actually Quit
+confirmLeaveYes.addEventListener('click', () => {
+    window.location.reload(); 
 });
 
 // 4. Handle Restart Signal (from Server)
@@ -701,4 +767,21 @@ socket.on('game_restarted', () => {
     // Also hide modal just in case
     gameOverModal.classList.add('hidden');
     showFlashMessage("RESTART!");
+});
+
+// 7. Handle False Snap Penalty (Add this at the bottom of script.js)
+socket.on('penalty_flash', (msg) => {
+    const flashDiv = document.getElementById('flash-message');
+    const flashText = document.getElementById('flash-text');
+    
+    flashText.innerText = msg;
+    flashText.style.color = "#FF6B6B"; // Red Text
+    flashDiv.classList.remove('hidden');
+    triggerShake(document.body); // Shake the screen
+
+    setTimeout(() => {
+        flashDiv.classList.add('hidden');
+        // Reset color back to gold for next time
+        flashText.style.color = "#FFE66D"; 
+    }, 1500);
 });

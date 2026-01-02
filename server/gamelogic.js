@@ -74,6 +74,12 @@ function startGame(io, roomId) {
     room.gameStatus = 'ACTIVE';
     room.centerPile = [];
 
+    // --- 🛡️ SAFETY LOCK: FORCE CLEAR VOTES ---
+    // This guarantees the new game starts with 0 votes, no matter what.
+    if (room.rematchVotes) {
+        room.rematchVotes.clear();
+    }
+
     // ... (Deck shuffling logic is same) ...
     const gameDeck = new Deck();
     gameDeck.shuffle();
@@ -137,6 +143,7 @@ function playCard(socket, io, roomId) {
 
     // BROADCAST UPDATE TO THE ROOM
     // We use io.to(roomId) so only people in this game see it
+   // BROADCAST UPDATE TO THE ROOM
     io.to(roomId).emit('card_played', {
         card: playedCard,
         turn: nextPlayerId,
@@ -145,57 +152,94 @@ function playCard(socket, io, roomId) {
             { id: room.players[0].id, count: room.players[0].hand.length },
             { id: room.players[1].id, count: room.players[1].hand.length }
         ]
+        
     });
 
-    // Check Game Over (Empty Hand)
-    if (player.hand.length === 0) {
-        finishGame(io, roomId, nextPlayerId, socket.id); // Opponent wins
+    // --- FIX 2: LAST MOVE SURVIVAL LOGIC ---
+    // Only end the game if hand is empty AND there is NO match.
+    // If there IS a match, the player stays alive to try and Snap!
+    if (player.hand.length === 0 && !isMatch) {
+        finishGame(io, roomId, nextPlayerId, socket.id); // Opponent wins immediately
     }
 }
 
 // ============================================================
 // 5. HANDLE SNAP
 // ============================================================
+// REPLACE your entire handleSnap function with this:
+
 function handleSnap(socket, io, roomId) {
     const room = rooms[roomId];
     if (!room) return;
 
     const pile = room.centerPile;
-    if (pile.length < 2) return;
+    
+    // Identify Player & Opponent
+    const playerIndex = room.players.findIndex(p => p.id === socket.id);
+    const opponentIndex = (playerIndex + 1) % 2;
+    const player = room.players[playerIndex];
+    const opponent = room.players[opponentIndex];
 
-    // Verify Match
-    const last = pile[pile.length - 1];
-    const prev = pile[pile.length - 2];
+    // --- CHECK MATCH ---
+    let isMatch = false;
+    if (pile.length >= 2) {
+        const last = pile[pile.length - 1];
+        const prev = pile[pile.length - 2];
+        if (last.character === prev.character) isMatch = true;
+    }
 
-    if (last.character !== prev.character) {
-        console.log(`[FALSE SNAP] in Room ${roomId}`);
+    // --- PENALTY LOGIC (False Snap) ---
+    if (!isMatch) {
+        console.log(`[FALSE SNAP] Penalty for ${player.name}`);
+        
+        // Only apply penalty if they actually have cards to lose
+        if (player.hand.length > 0) {
+            const penaltyCard = player.hand.pop();
+            opponent.hand.unshift(penaltyCard); // Transfer card to opponent
+            
+            // 1. Notify Room (Update Counts)
+            io.to(roomId).emit('game_update', {
+                turn: room.gameStatus === 'ACTIVE' ? room.players.find(p => p.hand.length > 0).id : socket.id,
+                players: [
+                    { id: room.players[0].id, count: room.players[0].hand.length },
+                    { id: room.players[1].id, count: room.players[1].hand.length }
+                ]
+            });
+            
+            // 2. Send RED FLASH event to clients
+            io.to(socket.id).emit('penalty_flash', "FALSE SNAP! -1 Card");
+            io.to(opponent.id).emit('penalty_flash', "OPPONENT MISSED! +1 Card");
+            
+            // 3. Did they die from the penalty?
+            if (player.hand.length === 0) {
+                finishGame(io, roomId, opponent.id, player.id);
+            }
+        }
         return; 
     }
 
-    // Winner Logic
-    const winnerIndex = room.players.findIndex(p => p.id === socket.id);
-    const winner = room.players[winnerIndex];
-
-    // Give cards to winner
-    winner.hand.unshift(...room.centerPile);
+    // --- VALID SNAP LOGIC ---
+    player.hand.unshift(...room.centerPile);
     room.centerPile = [];
 
-    // Notify Room
     io.to(roomId).emit('snap_success', {
         winnerId: socket.id,
-        winnerName: winner.name
+        winnerName: player.name
     });
 
-    // Resume Game
     io.to(roomId).emit('game_update', {
-        turn: socket.id, // Winner keeps turn
+        turn: socket.id, 
         players: [
             { id: room.players[0].id, count: room.players[0].hand.length },
             { id: room.players[1].id, count: room.players[1].hand.length }
         ]
     });
-}
 
+    // Check if the OTHER player is now dead (because they failed to snap their last chance)
+    if (opponent.hand.length === 0) {
+        finishGame(io, roomId, player.id, opponent.id);
+    }
+}
 // ============================================================
 // 6. CLEANUP (Disconnect)
 // ============================================================
