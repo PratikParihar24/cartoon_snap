@@ -283,6 +283,26 @@ function finishGame(io, roomId, winnerId, loserId) {
     // The room will be deleted when they disconnect (close the tab).
 }
 
+// Add this new function
+function leaveRoom(io, socket, roomId) {
+    const room = rooms[roomId];
+    if (room) {
+        // Remove player from room data
+        room.players = room.players.filter(p => p.id !== socket.id);
+        
+        // If room is empty, delete it
+        if (room.players.length === 0) {
+            delete rooms[roomId];
+            console.log(`[SERVER] Room ${roomId} deleted (Empty).`);
+        } else {
+            // If someone is still there (unlikely in waiting room), notify them
+            io.to(roomId).emit('opponent_left');
+        }
+    }
+    socket.leave(roomId);
+}
+
+
 
 // server/gamelogic.js
 
@@ -326,4 +346,4 @@ function restartGame(io, roomId, socketId) {
     }
 }
 // Ensure you export the same list as before!
-module.exports = { createRoom, joinRoom, playCard, handleSnap, removePlayer, restartGame };
+module.exports = { createRoom, joinRoom, playCard, handleSnap, removePlayer, restartGame ,leaveRoom};

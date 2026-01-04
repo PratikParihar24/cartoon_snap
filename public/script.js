@@ -785,3 +785,17 @@ socket.on('penalty_flash', (msg) => {
         flashText.style.color = "#FFE66D"; 
     }, 1500);
 });
+
+// --- CANCEL ROOM LOGIC ---
+document.getElementById('cancel-room-btn').onclick = () => {
+    // 1. Tell Server I'm leaving
+    socket.emit('leave_room', { roomId: currentRoomId });
+
+    // 2. Reset UI locally
+    document.getElementById('waiting-screen').classList.add('hidden');
+    document.getElementById('lobby-screen').classList.remove('hidden');
+    
+    // 3. Reset Variables
+    currentRoomId = null;
+    isMatchActive = false;
+};

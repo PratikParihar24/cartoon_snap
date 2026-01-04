@@ -946,3 +946,12 @@ input:focus { border-color: var(--secondary); }
     display: block;
 }
 
+/* CANCEL BUTTON (Centered & Compact) */
+#cancel-room-btn {
+    display: block;       /* Allows margin auto to work */
+    width: fit-content;   /* Shrink to fit the text */
+    margin: 20px auto 0;  /* Top margin 20px, Left/Right Auto (Centers it) */
+    padding: 10px 30px;   /* Comfortable padding */
+    font-size: 1rem;      /* Not too huge */
+}
+
