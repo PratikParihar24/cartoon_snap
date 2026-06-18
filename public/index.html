@@ -26,20 +26,94 @@
         </ul>
     </div>
 
-    <div id="lobby-screen" class="lobby-container">
-        <h1>Cartoon Snap!</h1>
+    <!-- MOBILE MENU BLUR OVERLAY -->
+    <div id="menu-overlay" class="menu-overlay"></div>
+
+    <!-- NEW STICKY NAVBAR -->
+    <nav id="main-nav" class="candy-nav">
+        <img src="/assets/game_logo.png" alt="Cartoon Snap Logo" class="nav-logo">
+        <button id="hamburger-menu" class="hamburger-menu">☰</button>
+        <div id="nav-links" class="nav-links">
+            <button class="nav-link nav-btn" data-modal="rules">How to Play</button>
+            <button class="nav-link nav-btn" data-modal="about">About the Dev</button>
+            <button class="nav-link nav-btn" data-modal="feedback">Feedback</button>
+            <button class="nav-link nav-btn" data-modal="settings">Settings</button>
+            <button id="close-menu" class="close-menu-btn">X</button>
+        </div>
+    </nav>
+
+    <!-- MAIN LANDING SCREEN -->
+    <div id="landing-screen" class="landing-container">
+        <section id="home" class="candy-card">
+            <h1 class="candy-title">Cartoon Snap!</h1>
+            <p class="candy-subtitle">The fastest multiplayer card game.</p>
+            <button id="play-game-btn" class="main-btn candy-btn" disabled>Connecting to Server...</button>
+        </section>
+    </div>
+
+    <!-- MODAL BACKDROP & CONTAINER -->
+    <div id="candy-modal-backdrop" class="candy-modal-backdrop hidden">
+        <div class="candy-modal">
+            <button id="candy-modal-close" class="close-btn">X</button>
+            
+            <!-- MODAL CONTENTS -->
+            <div id="modal-rules" class="modal-module hidden">
+                <h2>How to Play 🎮</h2>
+                <ul class="rules-list">
+                    <li>🃏 <strong>Matching:</strong> Take turns playing cards to the center pile.</li>
+                    <li>⚡ <strong>Snapping:</strong> When two matching characters appear, hit SNAP!</li>
+                    <li>❌ <strong>False Snap Penalties:</strong> Hitting SNAP when there's no match skips your next turn!</li>
+                </ul>
+            </div>
+
+            <div id="modal-about" class="modal-module hidden">
+                <h2>About the Dev 👨‍💻</h2>
+                <p>I'm a third-year CS graduate and full-stack developer who builds in public. This project was built to master raw WebSockets, following previous architecture wins with extensions like FocusFlow and complex UI projects like Datify.</p>
+            </div>
+
+            <div id="modal-feedback" class="modal-module hidden">
+                <h2>Feedback 💌</h2>
+                <form id="feedback-form">
+                    <textarea id="feedback-text" class="candy-input" placeholder="Enter your feedback..." rows="4" style="width: 100%;"></textarea>
+                    <button type="submit" class="secondary-btn candy-btn" style="margin-top: 10px;">Submit</button>
+                </form>
+            </div>
+
+            <div id="modal-settings" class="modal-module hidden">
+                <h2>Settings ⚙️</h2>
+                <div class="settings-row">
+                    <span>Sound Effects</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="settings-row">
+                    <span>Dark Mode</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOBBY SCREEN (Hidden by default) -->
+    <div id="lobby-screen" class="lobby-container hidden candy-card">
+        <h2 class="candy-title-small">Join the Action</h2>
         <p>Enter your name to get started</p>
         
-        <input type="text" id="username-input" placeholder="Your Name" maxlength="12">
+        <input type="text" id="username-input" class="candy-input" placeholder="Your Name" maxlength="12">
 
         <div class="lobby-controls">
-            <button id="create-btn" class="main-btn">Create New Game</button>
+            <button id="create-btn" class="main-btn candy-btn">Create New Game</button>
             
             <div class="divider">- OR -</div>
             
             <div class="join-area">
-                <input type="text" id="room-code-input" placeholder="ROOM CODE" maxlength="6">
-                <button id="join-btn" class="secondary-btn">Join Game</button>
+                <input type="text" id="room-code-input" class="candy-input" placeholder="ROOM CODE" maxlength="6">
+                <button id="join-btn" class="secondary-btn candy-btn">Join Game</button>
             </div>
         </div>
         <p id="lobby-status" class="status-text"></p>

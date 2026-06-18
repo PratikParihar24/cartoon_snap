@@ -4,8 +4,13 @@ const socket = io();
 
 // --- DOM Elements ---
 // Screens
+const landingScreen = document.getElementById('landing-screen');
 const lobbyScreen = document.getElementById('lobby-screen');
 const gameScreen = document.getElementById('game-screen');
+const mainNav = document.getElementById('main-nav');
+
+// Landing Controls
+const playGameBtn = document.getElementById('play-game-btn');
 
 // Lobby Controls
 const createBtn = document.getElementById('create-btn');
@@ -110,7 +115,107 @@ function updateTurnUI(isMine, isMatch) {
 }
 
 // ========================================================
-// A. LOBBY LOGIC (NEW)
+// A. SPA & CONNECTION LOGIC (NEW)
+// ========================================================
+
+// 1. Connection Event (Cold Start Fix)
+socket.on('connect', () => {
+    console.log('Connected to server!');
+    if (playGameBtn) {
+        playGameBtn.disabled = false;
+        playGameBtn.innerText = "Play Game";
+    }
+});
+
+// 2. Transition from Landing to Lobby
+if (playGameBtn) {
+    playGameBtn.addEventListener('click', () => {
+        landingScreen.classList.add('hidden');
+        if (mainNav) mainNav.classList.add('hidden');
+        lobbyScreen.classList.remove('hidden');
+    });
+}
+
+// 3. Modal Logic
+const modalBackdrop = document.getElementById('candy-modal-backdrop');
+const modalCloseBtn = document.getElementById('candy-modal-close');
+const navBtns = document.querySelectorAll('.nav-btn');
+const modalModules = document.querySelectorAll('.modal-module');
+const feedbackForm = document.getElementById('feedback-form');
+const feedbackText = document.getElementById('feedback-text');
+const hamburgerMenu = document.getElementById('hamburger-menu');
+const closeMenuBtn = document.getElementById('close-menu');
+const navLinksContainer = document.getElementById('nav-links');
+const menuOverlay = document.getElementById('menu-overlay');
+
+if (hamburgerMenu && navLinksContainer) {
+    hamburgerMenu.addEventListener('click', () => {
+        navLinksContainer.classList.add('active');
+        if (menuOverlay) menuOverlay.classList.add('active');
+    });
+}
+
+function closeMobileMenu() {
+    if (navLinksContainer) navLinksContainer.classList.remove('active');
+    if (menuOverlay) menuOverlay.classList.remove('active');
+}
+
+if (closeMenuBtn) {
+    closeMenuBtn.addEventListener('click', closeMobileMenu);
+}
+
+if (menuOverlay) {
+    menuOverlay.addEventListener('click', closeMobileMenu);
+}
+
+if (modalBackdrop) {
+    // Open Modals
+    navBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetModal = btn.getAttribute('data-modal');
+            
+            // Hide hamburger menu and overlay if open
+            if (typeof closeMobileMenu === 'function') {
+                closeMobileMenu();
+            }
+            
+            // Hide all modules
+            modalModules.forEach(mod => mod.classList.add('hidden'));
+            
+            // Show targeted module
+            const targetElement = document.getElementById(`modal-${targetModal}`);
+            if (targetElement) {
+                targetElement.classList.remove('hidden');
+                modalBackdrop.classList.remove('hidden');
+            }
+        });
+    });
+
+    // Close Modals
+    modalCloseBtn.addEventListener('click', () => {
+        modalBackdrop.classList.add('hidden');
+    });
+
+    // Close on clicking backdrop
+    modalBackdrop.addEventListener('click', (e) => {
+        if (e.target === modalBackdrop) {
+            modalBackdrop.classList.add('hidden');
+        }
+    });
+}
+
+// 4. Feedback Form Logic
+if (feedbackForm) {
+    feedbackForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        feedbackText.value = '';
+        modalBackdrop.classList.add('hidden');
+        showCustomAlert("Success! 🎉", "Your feedback has been saved. Thank you!");
+    });
+}
+
+// ========================================================
+// B. LOBBY LOGIC (NEW)
 // ========================================================
 
 // 1. Create Game
