@@ -1537,34 +1537,6 @@ input:checked+.toggle-slider:before {
     }
 }
 
-/* EDGE CASE 1: Force Portrait Mode*/
-#landscape-warning {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--bg-color);
-    z-index: 99999;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 20px;
-}
-
-/* Only show this if width > height (Landscape) on true mobile/touch devices */
-@media screen and (max-height: 600px) and (orientation: landscape) and (pointer: coarse) and (hover: none) {
-    #landscape-warning {
-        display: flex;
-    }
-
-    #game-screen,
-    #lobby-screen {
-        display: none !important;
-    }
-}
 
 /* EDGE CASE 2: Safe Text Handling */
 .info-text {
