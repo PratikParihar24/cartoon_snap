@@ -15,6 +15,11 @@ const io = socketIo(server);
 
 app.use(express.static(path.join(__dirname, '../public')));
 
+// --- Keep-Awake Health Check ---
+app.get('/ping', (req, res) => {
+    res.status(200).send("Server is awake");
+});
+
 // 2. THE CONNECTION BLOCK
 io.on('connection', (socket) => {
     console.log(`New User Connected: ${socket.id}`);
