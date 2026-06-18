@@ -2,6 +2,45 @@
 
 const socket = io();
 
+// ========================================================
+// ASSET PRELOADER (Silently caches .webp assets)
+// ========================================================
+const DEFAULT_CHARACTERS = [
+    "cinderella", "doraemon", "himawari", "jack", "jerry", 
+    "jiyaan", "ninja_hattori", "nobita", "oggy", "shinchan", 
+    "sizuka", "sunio", "tom"
+];
+
+// Generate the paths for the default deck (Standard skin)
+const preloadPaths = DEFAULT_CHARACTERS.map(char => `/assets/standard/${char}.webp`);
+
+function preloadGameAssets(assetPaths) {
+    if (!assetPaths || assetPaths.length === 0) return;
+    
+    let loadedCount = 0;
+    const totalAssets = assetPaths.length;
+
+    assetPaths.forEach(path => {
+        const img = new Image();
+        
+        // Advance count regardless of success or failure so we don't hang
+        const onLoadOrError = () => {
+            loadedCount++;
+            if (loadedCount === totalAssets) {
+                console.log("✅ All game assets preloaded and cached.");
+            }
+        };
+        
+        img.onload = onLoadOrError;
+        img.onerror = onLoadOrError;
+        
+        img.src = path;
+    });
+}
+
+// Invoke silently in the background
+preloadGameAssets(preloadPaths);
+
 // --- DOM Elements ---
 // Screens
 const landingScreen = document.getElementById('landing-screen');
