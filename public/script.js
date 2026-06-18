@@ -6,8 +6,8 @@ const socket = io();
 // ASSET PRELOADER (Silently caches .webp assets)
 // ========================================================
 const DEFAULT_CHARACTERS = [
-    "cinderella", "doraemon", "himawari", "jack", "jerry", 
-    "jiyaan", "ninja_hattori", "nobita", "oggy", "shinchan", 
+    "cinderella", "doraemon", "himawari", "jack", "jerry",
+    "jiyaan", "ninja_hattori", "nobita", "oggy", "shinchan",
     "sizuka", "sunio", "tom"
 ];
 
@@ -16,13 +16,13 @@ const preloadPaths = DEFAULT_CHARACTERS.map(char => `/assets/standard/${char}.we
 
 function preloadGameAssets(assetPaths) {
     if (!assetPaths || assetPaths.length === 0) return;
-    
+
     let loadedCount = 0;
     const totalAssets = assetPaths.length;
 
     assetPaths.forEach(path => {
         const img = new Image();
-        
+
         // Advance count regardless of success or failure so we don't hang
         const onLoadOrError = () => {
             loadedCount++;
@@ -30,16 +30,21 @@ function preloadGameAssets(assetPaths) {
                 console.log("✅ All game assets preloaded and cached.");
             }
         };
-        
+
         img.onload = onLoadOrError;
         img.onerror = onLoadOrError;
-        
+
         img.src = path;
     });
 }
 
 // Invoke silently in the background
 preloadGameAssets(preloadPaths);
+
+// ========================================================
+// PHASE 2: EVENT DATA PACKING ENUMS
+// ========================================================
+const Actions = { PLAY: 1, SNAP: 2 };
 
 // --- DOM Elements ---
 // Screens
@@ -97,6 +102,7 @@ let isMatchActive = false;
 let isGameOver = false;
 let currentRoomId = null; // <--- V2 CRITICAL: We must remember our room!
 let currentSkin = 'default'; // Default skin
+let expectedServerConfirmations = 0; // Phase 3: Optimistic UI tracking
 
 // --- AUDIO SYSTEM ---
 const audioFlip = new Audio('/assets/audio/flip.wav');
@@ -119,7 +125,7 @@ function triggerShake(element) {
     element.classList.remove('shake-anim'); // Reset
     void element.offsetWidth; // Force Reflow (Magic trick to restart animation)
     element.classList.add('shake-anim'); // Apply
-    
+
     // Play a dull "thud" sound if you have one, or just silent visual feedback
 }
 
@@ -143,7 +149,7 @@ function updateTurnUI(isMine, isMatch) {
         statusMsg.innerText = randomText;
         statusMsg.className = "status-message status-mine"; // Apply CSS
         myDeck.style.border = "4px solid #FFE66D"; // Yellow Border
-    } 
+    }
     // 3. Handle OPPONENT TURN
     else {
         const randomText = oppPhrases[Math.floor(Math.random() * oppPhrases.length)];
@@ -212,15 +218,15 @@ if (modalBackdrop) {
     navBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const targetModal = btn.getAttribute('data-modal');
-            
+
             // Hide hamburger menu and overlay if open
             if (typeof closeMobileMenu === 'function') {
                 closeMobileMenu();
             }
-            
+
             // Hide all modules
             modalModules.forEach(mod => mod.classList.add('hidden'));
-            
+
             // Show targeted module
             const targetElement = document.getElementById(`modal-${targetModal}`);
             if (targetElement) {
@@ -261,9 +267,9 @@ if (feedbackForm) {
 createBtn.addEventListener('click', () => {
     const name = usernameInput.value.trim();
     // REPLACEMENT 1: Custom Modal
-    if (!name) { 
-        showCustomAlert("Missing Name", "Please enter your name to create a room!"); 
-        return; 
+    if (!name) {
+        showCustomAlert("Missing Name", "Please enter your name to create a room!");
+        return;
     }
     console.log("Creating room as " + name);
     // V2 Update: Send name along with request
@@ -276,13 +282,13 @@ joinBtn.addEventListener('click', () => {
     const code = roomInput.value.trim().toUpperCase();
 
     // REPLACEMENT 2: Custom Modal
-    if (!name) { 
-        showCustomAlert("Missing Name", "Please enter your name to join!"); 
-        return; 
+    if (!name) {
+        showCustomAlert("Missing Name", "Please enter your name to join!");
+        return;
     }
-    if (!code) { 
-        showCustomAlert("Missing Code", "Please enter a 6-letter Room Code!"); 
-        return; 
+    if (!code) {
+        showCustomAlert("Missing Code", "Please enter a 6-letter Room Code!");
+        return;
     }
     console.log(`Joining room ${code} as ${name}`);
     // V2 Update: Send name along with request
@@ -292,11 +298,11 @@ joinBtn.addEventListener('click', () => {
 // 3. Room Created -> GO TO WAITING SCREEN
 socket.on('room_created', (data) => {
     currentRoomId = data.roomId;
-    
+
     // Hide Lobby, Show Waiting Room
     lobbyScreen.classList.add('hidden');
     waitingScreen.classList.remove('hidden');
-    
+
     // Display the code
     displayRoomCode.innerText = data.roomId;
 
@@ -333,9 +339,9 @@ socket.on('game_start', (data) => {
     myNameDisplay.innerText = data.myName + " (YOU)";
     oppNameDisplay.innerText = data.oppName;
 
-    myCountDisplay.innerText = myHand.length; 
-    oppCountDisplay.innerText = data.opponentCardCount; 
-    
+    myCountDisplay.innerText = myHand.length;
+    oppCountDisplay.innerText = data.opponentCardCount;
+
     // REPLACE THE OLD IF/ELSE BLOCK WITH THIS:
     updateTurnUI(isMyTurn, false);
 });
@@ -359,7 +365,7 @@ socket.on('game_start', (data) => {
     // ... (previous reset code) ...
 
     // --- 🛑 NEW: RESET UI ARTIFACTS (Fixes the stuck menu button) ---
-    
+
     // 1. Reset the Menu "Restart" Button (Blue & Default Text)
     const menuRestartBtn = document.getElementById('restart-btn');
     menuRestartBtn.innerText = "🔄 Restart Game";
@@ -410,9 +416,9 @@ socket.on('game_start', (data) => {
     myHand = data.hand;
     isMyTurn = data.isMyTurn;
 
-    myCountDisplay.innerText = myHand.length; 
-    oppCountDisplay.innerText = data.opponentCardCount; 
-    
+    myCountDisplay.innerText = myHand.length;
+    oppCountDisplay.innerText = data.opponentCardCount;
+
     if (isMyTurn) {
         statusMsg.innerText = "Game Started! YOUR TURN";
         myDeck.style.border = "4px solid yellow";
@@ -425,11 +431,11 @@ socket.on('game_start', (data) => {
 
 // 2. User Plays a Card
 myDeck.addEventListener('click', () => {
-    if (isGameOver) return; 
+    if (isGameOver) return;
     // REPLACEMENT 3: If it's a match, don't alert. 
     // Just shake the SNAP button to tell them "CLICK ME!"
     if (isMatchActive) {
-        triggerShake(snapBtn); 
+        triggerShake(snapBtn);
         showFlashMessage("CLICK SNAP! 👇");
         return;
     }
@@ -445,7 +451,7 @@ myDeck.addEventListener('click', () => {
             statusMsg.innerText = oldText;
             statusMsg.style.color = "white";
         }, 1000);
-        return; 
+        return;
     }
 
     if (myHand.length === 0) {
@@ -453,22 +459,48 @@ myDeck.addEventListener('click', () => {
         return;
     }
 
-    // V2 UPDATE: We send the roomId now!
-    socket.emit('play_card', { roomId: currentRoomId });
+    // --- PHASE 3: OPTIMISTIC UI (PLAY CARD) ---
+    const playedCard = myHand.pop();
+    myCountDisplay.innerText = myHand.length;
+
+    // Render local card immediately
+    const imagePath = getCardImage(playedCard.style, playedCard.character);
+    centerPile.innerHTML = `
+        <div class="card face-up">
+            <img src="${imagePath}" alt="${playedCard.character}" class="card-img">
+        </div>
+    `;
+    playSound(audioFlip);
+
+    // Locally lock turn until server says otherwise
+    isMyTurn = false;
+    updateTurnUI(false, false);
+
+    expectedServerConfirmations++;
+
+    // --- NOTIFY SERVER (PHASE 2 PACKED EVENT) ---
+    socket.emit('game_action', [Actions.PLAY, currentRoomId]);
 });
 
 // 3. Server Updates Board
 // 3. Server Updates Board (Card Played)
 socket.on('card_played', (data) => {
-    playSound(audioFlip);
+    // --- PHASE 3: RECONCILIATION ---
+    // If we just optimistically played a card and it's our turn to yield,
+    // we don't need to replay the sound or re-render the image.
+    if (expectedServerConfirmations > 0 && data.turn !== socket.id) {
+        expectedServerConfirmations--;
+    } else {
+        playSound(audioFlip);
 
-    // A. Show the Card
-    const imagePath = getCardImage(data.card.style, data.card.character);
-    centerPile.innerHTML = `
-        <div class="card face-up">
-            <img src="${imagePath}" alt="${data.card.character}" class="card-img">
-        </div>
-    `;
+        // A. Show the Card
+        const imagePath = getCardImage(data.card.style, data.card.character);
+        centerPile.innerHTML = `
+            <div class="card face-up">
+                <img src="${imagePath}" alt="${data.card.character}" class="card-img">
+            </div>
+        `;
+    }
 
     // B. Update Counts
     data.players.forEach(player => {
@@ -493,26 +525,29 @@ socket.on('card_played', (data) => {
         snapBtn.classList.remove('hidden'); // Show Button
         isMatchActive = true;
         updateTurnUI(null, true); // Force "SNAP!" text
-        
+
         // Trigger shake immediately to grab attention
-        triggerShake(snapBtn); 
-        
+        triggerShake(snapBtn);
+
     } else {
         // --- NORMAL PLAY (No Match) ---
         snapBtn.classList.add('hidden'); // Hide Button
         isMatchActive = false;
-        
+
         // CRITICAL FIX: Reset the text to "Your Turn" or "Waiting"
-        updateTurnUI(isMyTurn, false); 
+        updateTurnUI(isMyTurn, false);
     }
 });
 
 // 4. Handle SNAP Button
 snapBtn.addEventListener('click', () => {
     console.log("🔴 SNAP CLICKED!");
-    // V2 UPDATE: Send roomId
-    socket.emit('snap_attempt', { roomId: currentRoomId });
+    // --- PHASE 3: OPTIMISTIC UI (SNAP) ---
+    playSound(audioSnap);
     snapBtn.classList.add('hidden');
+
+    // --- NOTIFY SERVER (PHASE 2 PACKED EVENT) ---
+    socket.emit('game_action', [Actions.SNAP, currentRoomId]);
 });
 
 // NEW: Clicking the Center Pile also attempts a SNAP
@@ -526,18 +561,22 @@ centerPile.addEventListener('click', () => {
 
     // 3. Send the Attempt (Server handles the penalty logic)
     console.log("🔴 PILE CLICKED (Snap Attempt)!");
-    socket.emit('snap_attempt', { roomId: currentRoomId });
+    // --- PHASE 3: OPTIMISTIC UI (SNAP) ---
+    playSound(audioSnap);
+    snapBtn.classList.add('hidden');
+
+    socket.emit('game_action', [Actions.SNAP, currentRoomId]);
 });
 
 // 5. Handle Snap Success
 socket.on('snap_success', (data) => {
-    playSound(audioSnap);
+    // Note: audioSnap might have been played optimistically already, but playing it again on confirm is often fine.
     fireConfetti();
     // ✨ NEW FLASH MESSAGE
     showFlashMessage(`${data.winnerName} WINS!`);
     snapBtn.classList.add('hidden');
     centerPile.innerHTML = `<div class="placeholder-text">Center Pile</div>`;
-    isMatchActive = false; 
+    isMatchActive = false;
 });
 
 // 6. Game Updates (Counts)
@@ -545,7 +584,7 @@ socket.on('snap_success', (data) => {
 socket.on('game_update', (data) => {
     // 1. Update Turn Logic (Concise & Clean)
     isMyTurn = (socket.id === data.turn);
-    
+
     // 2. Update UI (New Engaging Text/Colors)
     updateTurnUI(isMyTurn, false);
 
@@ -563,10 +602,10 @@ socket.on('game_update', (data) => {
 socket.on('game_over', (data) => {
     console.log("💀 GAME OVER EVENT RECEIVED"); // Check console for this
     isGameOver = true;
-    
+
     // 1. Determine Winner
     const amIWinner = (socket.id === data.winnerId);
-    
+
     // 2. Set Text
     if (amIWinner) {
         playSound(audioWin);
@@ -579,12 +618,12 @@ socket.on('game_over', (data) => {
         winnerTitle.style.color = "#FF6B6B";
         winnerMessage.innerText = "Better luck next time...";
     }
-    
+
     // 3. FORCE SHOW MODAL
     setTimeout(() => {
         console.log("🕒 Showing Modal Now..."); // Check console for this
         const modal = document.getElementById('game-over-modal');
-        
+
         if (modal) {
             modal.classList.remove('hidden');
             console.log("✅ Modal class list:", modal.classList.value);
@@ -601,13 +640,13 @@ socket.on('game_over', (data) => {
 function getCardImage(style, character) {
     // 1. Convert Style to lowercase (e.g., "Pixar" -> "pixar")
     const folder = style.toLowerCase();
-    
+
     // 2. Convert Character to lowercase AND replace spaces with underscores
     // (e.g., "Ninja Hattori" -> "ninja_hattori")
     const file = character.toLowerCase().replace(/ /g, '_'); // Regex replaces ALL spaces
-    
-    return `/assets/${folder}/${file}.png`;
-}   
+
+    return `/assets/${folder}/${file}.webp`;
+}
 
 
 // ========================================================
@@ -617,7 +656,7 @@ function getCardImage(style, character) {
 // 1. Toggle Menu
 menuBtn.addEventListener('click', () => {
     menuModal.classList.remove('hidden');
-    
+
     // NEW: Stop the urgent pulsing when they open the menu
     menuBtn.classList.remove('pulse-red');
 });
@@ -636,7 +675,7 @@ resumeBtn.addEventListener('click', () => {
 restartBtn.addEventListener('click', () => {
     // Instant Restart (Removes the annoying confirm)
     socket.emit('request_restart', { roomId: currentRoomId });
-    menuModal.classList.add('hidden'); 
+    menuModal.classList.add('hidden');
 });
 
 // 3. Leave Room (Go back to Lobby)
@@ -662,7 +701,7 @@ confirmLeaveNo.addEventListener('click', () => {
 
 // 4. Handle "Yes, Leave" -> Actually Quit
 confirmLeaveYes.addEventListener('click', () => {
-    window.location.reload(); 
+    window.location.reload();
 });
 
 // 4. Handle Restart Signal (from Server)
@@ -683,21 +722,21 @@ socket.on('game_restarted', () => {
 socket.on('opponent_left', () => {
     // 1. Notify the user
     showCustomAlert(
-        "Game Over", 
-        "Your opponent fled the battle! Returning to lobby...", 
+        "Game Over",
+        "Your opponent fled the battle! Returning to lobby...",
         () => { window.location.reload(); } // Action on click
     );
-    
+
     // 2. Reset the game by reloading the page
     // This is the cleanest way to clear all game state and variables
-    window.location.reload(); 
+    window.location.reload();
 });
 
 const soundBtn = document.getElementById('sound-btn');
 
 soundBtn.addEventListener('click', () => {
     isMuted = !isMuted; // Toggle the value
-    
+
     if (isMuted) {
         soundBtn.innerText = "🔇 Sound: OFF";
         soundBtn.style.backgroundColor = "#95a5a6"; // Gray out the button
@@ -714,16 +753,16 @@ skinOptions.forEach(option => {
     option.addEventListener('click', () => {
         // 1. Remove 'selected' class from all
         skinOptions.forEach(opt => opt.classList.remove('selected'));
-        
+
         // 2. Add 'selected' to clicked one
         option.classList.add('selected');
-        
+
         // 3. Update the variable
         currentSkin = option.getAttribute('data-skin');
-        
+
         // 4. Apply the new skin immediately!
         updateCardBacks();
-        
+
         console.log(`Skin changed to: ${currentSkin}`);
     });
 });
@@ -732,10 +771,10 @@ skinOptions.forEach(option => {
 function updateCardBacks() {
     // Select all cards that are face-down (class "back")
     const faceDownCards = document.querySelectorAll('.card.back');
-    
+
     faceDownCards.forEach(card => {
         // We set the background image via CSS variable or direct style
-        card.style.backgroundImage = `url('/assets/backs/${currentSkin}.png')`;
+        card.style.backgroundImage = `url('/assets/backs/${currentSkin}.webp')`;
         card.style.backgroundSize = 'cover';
         card.style.backgroundPosition = 'center';
     });
@@ -750,7 +789,7 @@ function fireConfetti() {
         origin: { y: 0.6, x: 0.4 },
         colors: ['#FF6B6B', '#4ECDC4', '#FFE66D'] // Your theme colors
     });
-    
+
     // Blast from the right
     confetti({
         particleCount: 100,
@@ -767,10 +806,10 @@ function fireConfetti() {
 function showFlashMessage(text) {
     const flashDiv = document.getElementById('flash-message');
     const flashText = document.getElementById('flash-text');
-    
+
     flashText.innerText = text;
     flashDiv.classList.remove('hidden');
-    
+
     // Auto-hide after animation (1.5s matches CSS animation)
     setTimeout(() => {
         flashDiv.classList.add('hidden');
@@ -782,18 +821,18 @@ function showCustomAlert(title, message, callback) {
     const modal = document.getElementById('alert-modal');
     document.getElementById('alert-title').innerText = title;
     document.getElementById('alert-msg').innerText = message;
-    
+
     const btn = document.getElementById('alert-btn');
-    
+
     // Clear old listeners to prevent stacking
     const newBtn = btn.cloneNode(true);
     btn.parentNode.replaceChild(newBtn, btn);
-    
+
     newBtn.addEventListener('click', () => {
         modal.classList.add('hidden');
         if (callback) callback();
     });
-    
+
     modal.classList.remove('hidden');
 }
 
@@ -803,10 +842,10 @@ function showCustomAlert(title, message, callback) {
 socket.on('init_error', (msg) => {
     // Hide the game/modal so it doesn't look stuck
     document.getElementById('game-over-modal').classList.add('hidden');
-    
+
     // Show alert and reload
     showCustomAlert("Connection Error", msg, () => {
-        window.location.reload(); 
+        window.location.reload();
     });
 });
 
@@ -815,12 +854,12 @@ socket.on('init_error', (msg) => {
 // 1. Rematch Button Click
 rematchBtn.addEventListener('click', () => {
     playSound(audioFlip);
-    
+
     // Disable button to prevent spam
     rematchBtn.disabled = true;
     rematchBtn.innerText = "⏳ Waiting for Opponent...";
     rematchBtn.style.opacity = "0.7";
-    
+
     // Tell server "I want a rematch"
     socket.emit('request_restart', { roomId: currentRoomId });
 });
@@ -833,10 +872,10 @@ exitBtn.addEventListener('click', () => {
 // 3. Handle Game Over Event (Show the Modal)
 socket.on('game_over', (data) => {
     isGameOver = true;
-    
+
     // Who won?
     const amIWinner = (socket.id === data.winnerId);
-    
+
     if (amIWinner) {
         playSound(audioWin);
         fireConfetti();
@@ -848,7 +887,7 @@ socket.on('game_over', (data) => {
         winnerTitle.style.color = "#FF6B6B"; // Red
         winnerMessage.innerText = "Better luck next time...";
     }
-    
+
     // Show Modal after small delay
     setTimeout(() => {
         gameOverModal.classList.remove('hidden');
@@ -891,10 +930,10 @@ socket.on('opponent_wants_rematch', () => {
 // 2. Handle "Rematch Success" (Force Close Modal & Reset Button)
 socket.on('rematch_success', () => {
     console.log("✅ Rematch Accepted! Resetting UI...");
-    
+
     // A. Hide the Game Over Modal
     document.getElementById('game-over-modal').classList.add('hidden');
-    
+
     // B. Reset the Button for next time
     const btn = document.getElementById('rematch-btn');
     btn.innerText = "🔄 Rematch";
@@ -917,7 +956,7 @@ socket.on('game_restarted', () => {
 socket.on('penalty_flash', (msg) => {
     const flashDiv = document.getElementById('flash-message');
     const flashText = document.getElementById('flash-text');
-    
+
     flashText.innerText = msg;
     flashText.style.color = "#FF6B6B"; // Red Text
     flashDiv.classList.remove('hidden');
@@ -926,7 +965,7 @@ socket.on('penalty_flash', (msg) => {
     setTimeout(() => {
         flashDiv.classList.add('hidden');
         // Reset color back to gold for next time
-        flashText.style.color = "#FFE66D"; 
+        flashText.style.color = "#FFE66D";
     }, 1500);
 });
 
@@ -938,7 +977,7 @@ document.getElementById('cancel-room-btn').onclick = () => {
     // 2. Reset UI locally
     document.getElementById('waiting-screen').classList.add('hidden');
     document.getElementById('lobby-screen').classList.remove('hidden');
-    
+
     // 3. Reset Variables
     currentRoomId = null;
     isMatchActive = false;

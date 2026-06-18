@@ -1,15 +1,21 @@
 :root {
     /* Candy Color Palette */
-    --bg-color: #2b2e4a;         /* Deep Purple-Blue */
-    --primary: #FF6B6B;          /* Hot Pink/Red */
-    --primary-dark: #ee5253;     /* Darker Red */
-    --secondary: #4ECDC4;        /* Teal/Cyan */
-    --secondary-dark: #22a6b3;   /* Darker Teal */
-    --accent: #FFE66D;           /* Bright Yellow */
+    --bg-color: #2b2e4a;
+    /* Deep Purple-Blue */
+    --primary: #FF6B6B;
+    /* Hot Pink/Red */
+    --primary-dark: #ee5253;
+    /* Darker Red */
+    --secondary: #4ECDC4;
+    /* Teal/Cyan */
+    --secondary-dark: #22a6b3;
+    /* Darker Teal */
+    --accent: #FFE66D;
+    /* Bright Yellow */
     --text-color: #fff;
     --candy-border: 3px solid #000;
     --candy-shadow: 6px 6px 0px #000;
-    
+
     /* Spacing */
     --radius-lg: 20px;
     --radius-md: 12px;
@@ -29,24 +35,30 @@ html {
 }
 
 body {
-    font-family: 'Nunito', sans-serif; /* Readable font for body */
+    font-family: 'Nunito', sans-serif;
+    /* Readable font for body */
     background-color: var(--bg-color);
     background-image: radial-gradient(circle at 50% 50%, #3d426b 0%, #2b2e4a 100%);
     color: var(--text-color);
     height: 100dvh;
     width: 100vw;
     overflow-x: hidden;
-    overflow-y: auto; /* allow scrolling for landing page */
+    overflow-y: auto;
+    /* allow scrolling for landing page */
 }
 
 /* Headings use the Fun Font */
-h1, h2, h3 {
+h1,
+h2,
+h3 {
     font-family: 'Fredoka', sans-serif;
     letter-spacing: 1px;
 }
 
 /* Utilities */
-.hidden { display: none !important; }
+.hidden {
+    display: none !important;
+}
 
 
 /* =========================================
@@ -55,7 +67,8 @@ h1, h2, h3 {
 
 /* 1. THE JUICY 3D BUTTONS */
 button {
-    font-family: 'Fredoka', sans-serif; /* Matches Headings */
+    font-family: 'Fredoka', sans-serif;
+    /* Matches Headings */
     border: none;
     cursor: pointer;
     transition: transform 0.1s, box-shadow 0.1s;
@@ -63,15 +76,20 @@ button {
 }
 
 /* Base style for all major buttons */
-.main-btn, .secondary-btn, .action-btn, .menu-item {
+.main-btn,
+.secondary-btn,
+.action-btn,
+.menu-item {
     color: white;
     padding: 15px 30px;
     border-radius: var(--radius-lg);
     font-size: 1.2rem;
-    position: relative; /* Required for the "move down" effect */
+    position: relative;
+    /* Required for the "move down" effect */
     top: 0;
     margin-bottom: 15px;
-    width: 100%; /* Full width on mobile */
+    width: 100%;
+    /* Full width on mobile */
     font-weight: bold;
 }
 
@@ -100,11 +118,15 @@ button {
 /* Green/Teal Primary Button (Create Game) */
 .main-btn {
     background-color: var(--secondary);
-    box-shadow: 0 6px 0 var(--secondary-dark); /* The 3D Shadow */
+    box-shadow: 0 6px 0 var(--secondary-dark);
+    /* The 3D Shadow */
 }
+
 .main-btn:active {
-    top: 6px; /* Moves button down to cover the shadow */
-    box-shadow: 0 0 0 var(--secondary-dark); /* Squishes shadow */
+    top: 6px;
+    /* Moves button down to cover the shadow */
+    box-shadow: 0 0 0 var(--secondary-dark);
+    /* Squishes shadow */
 }
 
 /* Blue Secondary Button (Join Game) */
@@ -112,6 +134,7 @@ button {
     background-color: #54a0ff;
     box-shadow: 0 6px 0 #2e86de;
 }
+
 .secondary-btn:active {
     top: 6px;
     box-shadow: 0 0 0 #2e86de;
@@ -124,7 +147,7 @@ button {
     z-index: 1000;
     background: rgba(43, 46, 74, 0.8);
     backdrop-filter: blur(10px);
-    border-bottom: 2px solid rgba(255,255,255,0.1);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -135,9 +158,12 @@ button {
 .nav-logo {
     height: 40px;
     width: auto;
-    mix-blend-mode: screen; /* Drops out dark backgrounds */
-    filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.8)); /* Adds a shadow to make it pop */
-    border-radius: 8px; /* Smooth edges if it has a border */
+    mix-blend-mode: screen;
+    /* Drops out dark backgrounds */
+    filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.8));
+    /* Adds a shadow to make it pop */
+    border-radius: 8px;
+    /* Smooth edges if it has a border */
 }
 
 .hamburger-menu {
@@ -189,7 +215,7 @@ button {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.8);
+    background: rgba(0, 0, 0, 0.8);
     z-index: 2000;
     display: flex;
     align-items: center;
@@ -205,7 +231,7 @@ button {
     padding: 30px;
     border-radius: 25px;
     border: 5px solid var(--secondary);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     text-align: center;
 }
 
@@ -237,10 +263,11 @@ button {
     font-size: 2rem;
     margin-bottom: 20px;
     color: var(--secondary);
-    text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+    text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
 }
 
-.modal-module p, .modal-module li {
+.modal-module p,
+.modal-module li {
     font-size: 1.1rem;
     line-height: 1.5;
     color: var(--bg-color);
@@ -259,7 +286,7 @@ button {
     background: rgba(0, 0, 0, 0.05);
     padding: 10px 15px;
     border-radius: 8px;
-    border: 2px solid rgba(0,0,0,0.1);
+    border: 2px solid rgba(0, 0, 0, 0.1);
 }
 
 .toggle-switch {
@@ -301,11 +328,11 @@ button {
     border: 2px solid #000;
 }
 
-input:checked + .toggle-slider {
+input:checked+.toggle-slider {
     background-color: var(--secondary);
 }
 
-input:checked + .toggle-slider:before {
+input:checked+.toggle-slider:before {
     transform: translateX(22px);
 }
 
@@ -315,9 +342,11 @@ input:checked + .toggle-slider:before {
     flex-direction: column;
     align-items: center;
     padding: 40px 20px;
-    gap: 60px; /* Increased gap for sections */
+    gap: 60px;
+    /* Increased gap for sections */
     width: 100%;
-    max-width: 800px; /* Wider for website feel */
+    max-width: 800px;
+    /* Wider for website feel */
     margin: 0 auto;
 }
 
@@ -326,7 +355,7 @@ input:checked + .toggle-slider:before {
     backdrop-filter: blur(10px);
     padding: 30px;
     border-radius: 25px;
-    border: 2px solid rgba(255,255,255,0.1);
+    border: 2px solid rgba(255, 255, 255, 0.1);
     width: 100%;
     text-align: center;
 }
@@ -335,10 +364,13 @@ input:checked + .toggle-slider:before {
 
 .candy-title {
     font-size: 3.5rem;
-    color: var(--accent); /* Bright Yellow */
+    color: var(--accent);
+    /* Bright Yellow */
     margin-bottom: 20px;
-    text-shadow: 4px 4px 0px #e67e22; /* Comic book shadow */
-    transform: rotate(-3deg); /* Jaunty angle */
+    text-shadow: 4px 4px 0px #e67e22;
+    /* Comic book shadow */
+    transform: rotate(-3deg);
+    /* Jaunty angle */
 }
 
 .candy-title-small {
@@ -385,10 +417,13 @@ input:checked + .toggle-slider:before {
 
 .lobby-container h1 {
     font-size: 3.5rem;
-    color: var(--accent); /* Bright Yellow */
+    color: var(--accent);
+    /* Bright Yellow */
     margin-bottom: 20px;
-    text-shadow: 4px 4px 0px #e67e22; /* Comic book shadow */
-    transform: rotate(-3deg); /* Jaunty angle */
+    text-shadow: 4px 4px 0px #e67e22;
+    /* Comic book shadow */
+    transform: rotate(-3deg);
+    /* Jaunty angle */
 }
 
 /* Glass effect box for controls -> Replaced with Candy UI */
@@ -406,22 +441,32 @@ input:checked + .toggle-slider:before {
     box-shadow: 4px 4px 0px #000;
     font-size: 1.2rem;
     text-align: center;
-    width: 80%;       /* Takes up less space */
-    max-width: 250px; /* Never gets wider than 250px */
-    margin: 0 auto 15px auto; /* Centers it and adds bottom spacing */
-    display: block;   /* Ensures centering works */
+    width: 80%;
+    /* Takes up less space */
+    max-width: 250px;
+    /* Never gets wider than 250px */
+    margin: 0 auto 15px auto;
+    /* Centers it and adds bottom spacing */
+    display: block;
+    /* Ensures centering works */
     outline: none;
     margin-bottom: 10px;
     background: #fff;
     color: #000;
     transition: all 0.2s;
 }
-.candy-input:focus { 
+
+.candy-input:focus {
     box-shadow: 0px 0px 0px #000, 0 0 0 4px var(--secondary);
     transform: translate(4px, 4px);
 }
 
-.divider { margin: 15px 0; font-weight: 900; opacity: 0.7; color: #000; }
+.divider {
+    margin: 15px 0;
+    font-weight: 900;
+    opacity: 0.7;
+    color: #000;
+}
 
 /* 3. WAITING ROOM STYLES */
 .code-display {
@@ -444,11 +489,25 @@ input:checked + .toggle-slider:before {
 }
 
 /* Specific Button Colors */
-.action-btn { background-color: #34495e; box-shadow: 0 6px 0 #2c3e50; }
-.action-btn:active { top: 6px; box-shadow: none; }
+.action-btn {
+    background-color: #34495e;
+    box-shadow: 0 6px 0 #2c3e50;
+}
 
-.whatsapp { background-color: #25D366; box-shadow: 0 6px 0 #128C7E; }
-.whatsapp:active { top: 6px; box-shadow: none; }
+.action-btn:active {
+    top: 6px;
+    box-shadow: none;
+}
+
+.whatsapp {
+    background-color: #25D366;
+    box-shadow: 0 6px 0 #128C7E;
+}
+
+.whatsapp:active {
+    top: 6px;
+    box-shadow: none;
+}
 
 /* =========================================
    PHASE 3: GAME BOARD & CARDS
@@ -466,7 +525,7 @@ input:checked + .toggle-slider:before {
 
 /* Player Info Pills (Rounded Tags) */
 .player-info {
-    background: rgba(0,0,0,0.3);
+    background: rgba(0, 0, 0, 0.3);
     padding: 5px 20px;
     border-radius: 50px;
     margin: 5px 0;
@@ -474,26 +533,43 @@ input:checked + .toggle-slider:before {
     display: flex;
     flex-direction: column;
     align-items: center;
-    border: 2px solid rgba(255,255,255,0.2);
+    border: 2px solid rgba(255, 255, 255, 0.2);
     min-width: 120px;
 }
-.name { color: var(--accent); font-size: 1rem; letter-spacing: 1px; }
-.card-count { font-size: 0.8rem; opacity: 0.9; }
+
+.name {
+    color: var(--accent);
+    font-size: 1rem;
+    letter-spacing: 1px;
+}
+
+.card-count {
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
 
 /* The Zones */
-.player-zone, .center-zone {
+.player-zone,
+.center-zone {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     position: relative;
 }
-.player-zone { height: 28%; }
-.center-zone { flex-grow: 1; }
+
+.player-zone {
+    height: 28%;
+}
+
+.center-zone {
+    flex-grow: 1;
+}
 
 /* 2. THE CARDS (Sticker Style) */
 .deck-container {
-    perspective: 1000px; /* Adds depth for 3D feel */
+    perspective: 1000px;
+    /* Adds depth for 3D feel */
 }
 
 .card {
@@ -501,8 +577,10 @@ input:checked + .toggle-slider:before {
     height: 140px;
     background: white;
     border-radius: 12px;
-    border: 4px solid white; /* Thick white border = Sticker look */
-    box-shadow: 0 8px 0 rgba(0,0,0,0.2); /* Chunky shadow */
+    border: 4px solid white;
+    /* Thick white border = Sticker look */
+    box-shadow: 0 8px 0 rgba(0, 0, 0, 0.2);
+    /* Chunky shadow */
     overflow: hidden;
     position: relative;
     transition: transform 0.1s;
@@ -517,15 +595,17 @@ input:checked + .toggle-slider:before {
 
 /* Interaction: Pressing your deck feels real */
 #player-zone .card:active {
-    transform: translateY(4px); /* Pushes down */
-    box-shadow: 0 4px 0 rgba(0,0,0,0.2); /* Shadow shrinks */
+    transform: translateY(4px);
+    /* Pushes down */
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+    /* Shadow shrinks */
 }
 
 /* Center Pile Slot */
 .pile-slot {
     width: 110px;
     height: 150px;
-    border: 3px dashed rgba(255,255,255,0.3);
+    border: 3px dashed rgba(255, 255, 255, 0.3);
     border-radius: 15px;
     display: flex;
     align-items: center;
@@ -534,18 +614,24 @@ input:checked + .toggle-slider:before {
 
 /* 1. THE CONTAINER (Defines the Size) */
 .snap-container {
-    position: relative; /* Creates a positioning context */
-    width: 110px;       /* Desktop Card Width */
-    height: 150px;      /* Desktop Card Height */
-    margin: 0 auto;     /* Centers the container horizontally */
+    position: relative;
+    /* Creates a positioning context */
+    width: 110px;
+    /* Desktop Card Width */
+    height: 150px;
+    /* Desktop Card Height */
+    margin: 0 auto;
+    /* Centers the container horizontally */
 }
 
 /* 2. THE PILE (Fills the Container) */
 .pile-slot {
-    width: 100%;       /* Fill parent */
-    height: 100%;      /* Fill parent */
+    width: 100%;
+    /* Fill parent */
+    height: 100%;
+    /* Fill parent */
     /* Keep your existing border/display styles below */
-    border: 3px dashed rgba(255,255,255,0.3);
+    border: 3px dashed rgba(255, 255, 255, 0.3);
     border-radius: 15px;
     display: flex;
     align-items: center;
@@ -557,16 +643,17 @@ input:checked + .toggle-slider:before {
     position: absolute;
     top: 0;
     left: 0;
-    
+
     /* Fill the container exactly */
     width: 100%;
     height: 100%;
-    
+
     /* Visuals */
     background-color: rgba(255, 107, 107, 0.95);
     border: 4px solid white;
-    border-radius: 15px; /* Matches card corners */
-    
+    border-radius: 15px;
+    /* Matches card corners */
+
     /* Text */
     color: white;
     font-family: 'Fredoka', sans-serif;
@@ -575,11 +662,11 @@ input:checked + .toggle-slider:before {
     display: flex;
     align-items: center;
     justify-content: center;
-    
+
     z-index: 100;
     cursor: pointer;
     box-shadow: 0 0 25px rgba(255, 107, 107, 0.8);
-    
+
     /* Animation: Grow from center */
     transform-origin: center;
     animation: popCover 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
@@ -587,19 +674,31 @@ input:checked + .toggle-slider:before {
 
 /* Animation Keyframes (No translate needed now!) */
 @keyframes popCover {
-    0% { transform: scale(0); opacity: 0; }
-    80% { transform: scale(1.1); opacity: 1; }
-    100% { transform: scale(1); opacity: 1; }
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    80% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 /* 4. MOBILE RESPONSIVENESS */
 @media screen and (max-width: 600px) {
+
     /* Resize the wrapper, and everything inside scales automatically */
     .snap-container {
         width: 85px;
         height: 120px;
     }
-    
+
     .snap-button {
         font-size: 1.2rem;
     }
@@ -618,7 +717,7 @@ input:checked + .toggle-slider:before {
     border-radius: 25px;
     width: 90%;
     max-width: 350px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     border: 5px solid var(--secondary);
 }
 
@@ -627,6 +726,7 @@ input:checked + .toggle-slider:before {
     background-color: var(--primary);
     box-shadow: 0 6px 0 var(--primary-dark);
 }
+
 .menu-item.danger:active {
     top: 6px;
     box-shadow: none;
@@ -634,36 +734,41 @@ input:checked + .toggle-slider:before {
 
 /* --- UPDATED HAMBURGER MENU (Floaty & Juicy) --- */
 .menu-toggle {
-    position: absolute; /* Stick to the corner of the game-screen */
+    position: absolute;
+    /* Stick to the corner of the game-screen */
     top: 15px;
     right: 15px;
-    
+
     width: 50px;
     height: 50px;
-    
+
     background: white;
     color: var(--bg-color);
-    
+
     border: none;
-    border-radius: 15px; /* Soft rounded square */
-    
+    border-radius: 15px;
+    /* Soft rounded square */
+
     /* The 3D Pop Effect */
     box-shadow: 0 5px 0 #bdc3c7;
-    
+
     font-size: 1.8rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    
+
     cursor: pointer;
-    z-index: 100; /* Ensure it floats above cards */
+    z-index: 100;
+    /* Ensure it floats above cards */
     transition: transform 0.1s;
 }
 
 /* Press Animation */
 .menu-toggle:active {
-    transform: translateY(5px); /* Move down physically */
-    box-shadow: 0 0 0 #bdc3c7; /* Shadow squishes */
+    transform: translateY(5px);
+    /* Move down physically */
+    box-shadow: 0 0 0 #bdc3c7;
+    /* Shadow squishes */
 }
 
 
@@ -672,27 +777,32 @@ input:checked + .toggle-slider:before {
    ========================================= */
 
 @media screen and (max-width: 600px) {
+
     /* 1. Adjust Layout for Vertical Screens */
     .game-board {
-        padding: 10px 5px; /* Less side padding on phones */
+        padding: 10px 5px;
+        /* Less side padding on phones */
     }
 
     /* 2. Resize Cards for small screens */
-    .card, .pile-slot {
-        width: 85px;  /* Optimal size for mobile portrait */
+    .card,
+    .pile-slot {
+        width: 85px;
+        /* Optimal size for mobile portrait */
         height: 120px;
     }
-    
+
     /* 3. Make the Title smaller in Lobby */
     .lobby-container h1 {
         font-size: 2.5rem;
     }
-    
+
     /* 4. Ensure the Menu Button clears the "Notch" */
     .menu-toggle {
-        top: max(15px, env(safe-area-inset-top)); 
+        top: max(15px, env(safe-area-inset-top));
         right: 15px;
-        width: 45px; /* Slightly smaller on phone */
+        width: 45px;
+        /* Slightly smaller on phone */
         height: 45px;
         font-size: 1.5rem;
     }
@@ -700,12 +810,13 @@ input:checked + .toggle-slider:before {
     /* 5. Opponent Name Adjustment */
     /* Push opponent down slightly so menu doesn't cover name */
     #opponent-zone .player-info {
-        margin-top: 25px; 
+        margin-top: 25px;
     }
-    
+
     /* 6. Fix Input Width */
     input[type="text"] {
-        width: 90%; /* Use full width on phones */
+        width: 90%;
+        /* Use full width on phones */
     }
 }
 
@@ -715,22 +826,26 @@ input:checked + .toggle-slider:before {
 
 /* 1. Style the Menu Buttons (Restart, Sound, Resume) */
 .menu-item {
-    display: block;        /* Force them to be block elements */
-    width: 100%;           /* Full width of the modal */
+    display: block;
+    /* Force them to be block elements */
+    width: 100%;
+    /* Full width of the modal */
     padding: 15px;
     margin-bottom: 15px;
-    
-    background-color: #3498db; /* Bright Blue by default */
+
+    background-color: #3498db;
+    /* Bright Blue by default */
     color: white;
-    
+
     font-family: 'Fredoka', sans-serif;
     font-size: 1.2rem;
     font-weight: bold;
     text-align: center;
-    
+
     border: none;
-    border-radius: 15px;   /* Rounded corners */
-    
+    border-radius: 15px;
+    /* Rounded corners */
+
     /* The 3D Pop Effect */
     box-shadow: 0 5px 0 #2980b9;
     position: relative;
@@ -746,22 +861,34 @@ input:checked + .toggle-slider:before {
 
 /* 2. Specific Button Colors */
 #resume-btn {
-    background-color: var(--secondary); /* Teal */
+    background-color: var(--secondary);
+    /* Teal */
     box-shadow: 0 5px 0 var(--secondary-dark);
 }
-#resume-btn:active { box-shadow: none; }
+
+#resume-btn:active {
+    box-shadow: none;
+}
 
 #sound-btn {
-    background-color: #f1c40f; /* Yellow */
+    background-color: #f1c40f;
+    /* Yellow */
     box-shadow: 0 5px 0 #d35400;
 }
-#sound-btn:active { box-shadow: none; }
+
+#sound-btn:active {
+    box-shadow: none;
+}
 
 .menu-item.danger {
-    background-color: var(--primary); /* Red */
+    background-color: var(--primary);
+    /* Red */
     box-shadow: 0 5px 0 var(--primary-dark);
 }
-.menu-item.danger:active { box-shadow: none; }
+
+.menu-item.danger:active {
+    box-shadow: none;
+}
 
 
 /* 3. CARD SKIN SELECTOR (The Missing Piece) */
@@ -790,7 +917,7 @@ input:checked + .toggle-slider:before {
     border: 3px solid transparent;
     transition: transform 0.2s;
     object-fit: cover;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
 .skin-option:hover {
@@ -799,7 +926,8 @@ input:checked + .toggle-slider:before {
 
 /* The Selected Skin (Green Border) */
 .skin-option.selected {
-    border: 4px solid var(--secondary); /* Teal Border */
+    border: 4px solid var(--secondary);
+    /* Teal Border */
     transform: scale(1.1);
     box-shadow: 0 0 15px rgba(78, 205, 196, 0.6);
 }
@@ -815,16 +943,19 @@ input:checked + .toggle-slider:before {
     left: 0;
     width: 100%;
     height: 100%;
-    
+
     /* 2. Dark Background */
-    background: rgba(43, 46, 74, 0.95); /* Slightly darker for focus */
+    background: rgba(43, 46, 74, 0.95);
+    /* Slightly darker for focus */
     backdrop-filter: blur(8px);
-    
+
     /* 3. CENTER THE BOX */
     display: flex;
-    justify-content: center; /* Horizontal Center */
-    align-items: center;     /* Vertical Center */
-    
+    justify-content: center;
+    /* Horizontal Center */
+    align-items: center;
+    /* Vertical Center */
+
     /* 4. Sit on top of everything */
     z-index: 1000;
 }
@@ -834,18 +965,19 @@ input:checked + .toggle-slider:before {
     color: var(--bg-color);
     padding: 30px;
     border-radius: 25px;
-    
+
     /* Size Controls */
     width: 90%;
     max-width: 350px;
-    
+
     /* The "Pop" styling */
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     border: 5px solid var(--secondary);
-    
+
     /* Ensure text inside is centered */
     text-align: center;
-    position: relative; /* Keeps it contained */
+    position: relative;
+    /* Keeps it contained */
 }
 
 /* Ensure the title inside looks good */
@@ -853,7 +985,7 @@ input:checked + .toggle-slider:before {
     margin-bottom: 20px;
     font-size: 2rem;
     color: var(--secondary);
-    text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+    text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
 }
 
 /* =========================================
@@ -868,8 +1000,10 @@ input:checked + .toggle-slider:before {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    z-index: -1; /* CRITICAL: Puts it behind everything */
-    pointer-events: none; /* Allows clicking through it */
+    z-index: -1;
+    /* CRITICAL: Puts it behind everything */
+    pointer-events: none;
+    /* Allows clicking through it */
 }
 
 /* 2. The Floating Shapes */
@@ -890,10 +1024,13 @@ input:checked + .toggle-slider:before {
     list-style: none;
     width: 20px;
     height: 20px;
-    background: rgba(255, 255, 255, 0.1); /* Subtle white glass */
+    background: rgba(255, 255, 255, 0.1);
+    /* Subtle white glass */
     animation: floatUp 25s linear infinite;
-    bottom: -150px; /* Start below screen */
-    border-radius: 4px; /* Soft corners */
+    bottom: -150px;
+    /* Start below screen */
+    border-radius: 4px;
+    /* Soft corners */
 }
 
 /* 3. Randomize the Shapes (Size, Position, Speed) */
@@ -989,10 +1126,13 @@ input:checked + .toggle-slider:before {
         opacity: 1;
         border-radius: 0;
     }
+
     100% {
-        transform: translateY(-1000px) rotate(720deg); /* Move UP and SPIN */
+        transform: translateY(-1000px) rotate(720deg);
+        /* Move UP and SPIN */
         opacity: 0;
-        border-radius: 50%; /* Morph into circle as they rise */
+        border-radius: 50%;
+        /* Morph into circle as they rise */
     }
 }
 
@@ -1000,7 +1140,7 @@ input:checked + .toggle-slider:before {
 /* --- AVATAR STYLES --- */
 .player-info {
     /* Update this to Row layout so avatar sits next to text */
-    flex-direction: row; 
+    flex-direction: row;
     gap: 10px;
     padding: 8px 15px;
 }
@@ -1008,9 +1148,11 @@ input:checked + .toggle-slider:before {
 .avatar-img {
     width: 50px;
     height: 50px;
-    border-radius: 50%; /* Circle */
+    border-radius: 50%;
+    /* Circle */
     background: #fff;
-    border: 2px solid var(--accent); /* Yellow border */
+    border: 2px solid var(--accent);
+    /* Yellow border */
     object-fit: cover;
 }
 
@@ -1028,9 +1170,12 @@ input:checked + .toggle-slider:before {
 /* 1. FLASH MESSAGE (For Snap Wins) */
 .flash-overlay {
     position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    pointer-events: none; /* Let clicks pass through */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    /* Let clicks pass through */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1039,40 +1184,59 @@ input:checked + .toggle-slider:before {
 
 .flash-content h1 {
     font-size: 4rem;
-    color: #FFE66D; /* Yellow */
-    text-shadow: 
-        4px 4px 0 #FF6B6B, /* Red Shadow */
-        -2px -2px 0 #2b2e4a; /* Dark Outline */
+    color: #FFE66D;
+    /* Yellow */
+    text-shadow:
+        4px 4px 0 #FF6B6B,
+        /* Red Shadow */
+        -2px -2px 0 #2b2e4a;
+    /* Dark Outline */
     transform: scale(0);
     animation: flashPop 1.5s ease-out forwards;
 }
 
 @keyframes flashPop {
-    0% { transform: scale(0) rotate(-10deg); opacity: 0; }
-    20% { transform: scale(1.5) rotate(0deg); opacity: 1; }
-    80% { transform: scale(1.2); opacity: 1; }
-    100% { transform: scale(2); opacity: 0; }
+    0% {
+        transform: scale(0) rotate(-10deg);
+        opacity: 0;
+    }
+
+    20% {
+        transform: scale(1.5) rotate(0deg);
+        opacity: 1;
+    }
+
+    80% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(2);
+        opacity: 0;
+    }
 }
 
 /* 2. CUSTOM ALERT MODAL (Reusing your modal styles) */
 /* (We reuse .modal-overlay and .modal-content from your existing CSS) */
 /* We just need to ensure the Z-Index is high enough */
 #alert-modal {
-    z-index: 3000; /* Highest priority */
+    z-index: 3000;
+    /* Highest priority */
 }
 
 /* FIXED CARD BACK STYLE */
 .card.back {
     /* 1. Force the default image via CSS */
-    background-image: url('/assets/backs/default.png'); 
-    
+    background-image: url('/assets/backs/default.webp');
+
     /* 2. Positioning */
     background-size: cover;
     background-position: center;
-    
+
     /* 3. Fallback color (Red) so it's never just white */
-    background-color: #FF6B6B; 
-    
+    background-color: #FF6B6B;
+
     /* 4. Ensure it looks like a card */
     border: 4px solid white;
     border-radius: 12px;
@@ -1080,15 +1244,25 @@ input:checked + .toggle-slider:before {
 
 /* GAME OVER MODAL */
 #game-over-modal {
-    z-index: 1500; /* Above game (100), below alerts (2000) */
-    backdrop-filter: blur(5px); /* Blurs the background game */
+    z-index: 1500;
+    /* Above game (100), below alerts (2000) */
+    backdrop-filter: blur(5px);
+    /* Blurs the background game */
 }
 
 /* Rematch Button Pulse Animation (Optional) */
 @keyframes pulse-orange {
-    0% { box-shadow: 0 0 0 0 rgba(230, 126, 34, 0.7); }
-    70% { box-shadow: 0 0 0 10px rgba(230, 126, 34, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(230, 126, 34, 0); }
+    0% {
+        box-shadow: 0 0 0 0 rgba(230, 126, 34, 0.7);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(230, 126, 34, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(230, 126, 34, 0);
+    }
 }
 
 .pulse {
@@ -1097,9 +1271,12 @@ input:checked + .toggle-slider:before {
 
 /* FORCE GAME OVER VISIBILITY */
 #game-over-modal {
-    display: flex !important; /* Forces it to use Flexbox layout */
-    z-index: 9999 !important; /* Forces it to be on top of EVERYTHING */
-    background: rgba(43, 46, 74, 0.95); /* Dark background */
+    display: flex !important;
+    /* Forces it to use Flexbox layout */
+    z-index: 9999 !important;
+    /* Forces it to be on top of EVERYTHING */
+    background: rgba(43, 46, 74, 0.95);
+    /* Dark background */
 }
 
 /* BUT... hide it when the 'hidden' class is present */
@@ -1113,16 +1290,31 @@ input:checked + .toggle-slider:before {
 
 /* The "Invalid Move" Shake */
 @keyframes shake {
-    0% { transform: translateX(0); }
-    25% { transform: translateX(-5px) rotate(-5deg); }
-    50% { transform: translateX(5px) rotate(5deg); }
-    75% { transform: translateX(-5px) rotate(-5deg); }
-    100% { transform: translateX(0); }
+    0% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px) rotate(-5deg);
+    }
+
+    50% {
+        transform: translateX(5px) rotate(5deg);
+    }
+
+    75% {
+        transform: translateX(-5px) rotate(-5deg);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
 }
 
 .shake-anim {
     animation: shake 0.4s ease-in-out;
-    border-color: #FF6B6B !important; /* Flash red border */
+    border-color: #FF6B6B !important;
+    /* Flash red border */
 }
 
 /* =========================================
@@ -1133,17 +1325,22 @@ input:checked + .toggle-slider:before {
 .status-message {
     font-family: 'Fredoka', sans-serif;
     font-size: 1.5rem;
-    margin-top: 0;         /* Reset top margin */
-    margin-bottom: 25px;   /* ✅ Add space below it (between text and cards) */
+    margin-top: 0;
+    /* Reset top margin */
+    margin-bottom: 25px;
+    /* ✅ Add space below it (between text and cards) */
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
-    z-index: 10;           /* Ensure it sits above any floating particles */
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    /* Ensure it sits above any floating particles */
 }
 
 /* 1. YOUR TURN (Glowing Yellow & Pulsing) */
 .status-mine {
-    color: #FFE66D; /* Bright Yellow */
-    font-size: 1.8rem; /* Slightly bigger */
+    color: #FFE66D;
+    /* Bright Yellow */
+    font-size: 1.8rem;
+    /* Slightly bigger */
     transform: scale(1.1);
     text-shadow: 0 0 15px rgba(255, 230, 109, 0.6);
     animation: gentlePulse 1s infinite alternate;
@@ -1151,7 +1348,8 @@ input:checked + .toggle-slider:before {
 
 /* 2. OPPONENT TURN (Dimmed & Small) */
 .status-opp {
-    color: rgba(255, 255, 255, 0.5); /* Ghostly white */
+    color: rgba(255, 255, 255, 0.5);
+    /* Ghostly white */
     font-size: 1.2rem;
     transform: scale(0.9);
     letter-spacing: 1px;
@@ -1159,23 +1357,41 @@ input:checked + .toggle-slider:before {
 
 /* 3. MATCH ALERT (Red, Huge & Shaking) */
 .status-match {
-    color: #FF6B6B; /* Hot Red */
+    color: #FF6B6B;
+    /* Hot Red */
     font-size: 2rem !important;
     font-weight: 900;
-    text-shadow: 3px 3px 0 #fff; /* Pop out */
-    animation: shake 0.5s infinite; /* Re-using your shake animation */
+    text-shadow: 3px 3px 0 #fff;
+    /* Pop out */
+    animation: shake 0.5s infinite;
+    /* Re-using your shake animation */
 }
 
 @keyframes gentlePulse {
-    from { transform: scale(1); opacity: 0.9; }
-    to { transform: scale(1.05); opacity: 1; }
+    from {
+        transform: scale(1);
+        opacity: 0.9;
+    }
+
+    to {
+        transform: scale(1.05);
+        opacity: 1;
+    }
 }
 
 /* URGENT NOTIFICATION PULSE */
 @keyframes pulse-red {
-    0% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
-    70% { box-shadow: 0 0 0 15px rgba(255, 107, 107, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); }
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7);
+    }
+
+    70% {
+        box-shadow: 0 0 0 15px rgba(255, 107, 107, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 107, 107, 0);
+    }
 }
 
 .pulse-red {
@@ -1191,7 +1407,8 @@ input:checked + .toggle-slider:before {
 }
 
 .menu-overlay {
-    display: none; /* Only shown on mobile */
+    display: none;
+    /* Only shown on mobile */
 }
 
 /* =========================================
@@ -1199,21 +1416,22 @@ input:checked + .toggle-slider:before {
    ========================================= */
 
 @media screen and (max-width: 768px) {
+
     /* Navbar adjustments */
     .candy-nav {
         flex-direction: row;
         flex-wrap: nowrap;
         padding: 15px;
     }
-    
+
     .hamburger-menu {
         display: block;
     }
-    
+
     .nav-logo {
         height: 35px;
     }
-    
+
     .menu-overlay {
         display: block;
         position: fixed;
@@ -1223,21 +1441,23 @@ input:checked + .toggle-slider:before {
         height: 100%;
         background: rgba(0, 0, 0, 0.2);
         backdrop-filter: blur(4px);
-        z-index: 900; /* Below candy-nav which is 1000 */
+        z-index: 900;
+        /* Below candy-nav which is 1000 */
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.3s ease;
     }
-    
+
     .menu-overlay.active {
         opacity: 1;
         pointer-events: auto;
     }
-    
+
     .nav-links {
         position: fixed;
         top: 0;
-        right: -300px; /* Hidden off-screen to the right */
+        right: -300px;
+        /* Hidden off-screen to the right */
         width: 250px;
         height: 100vh;
         background: rgba(43, 46, 74, 0.95);
@@ -1249,20 +1469,20 @@ input:checked + .toggle-slider:before {
         transition: right 0.3s ease-in-out;
         z-index: 2000;
         margin-top: 0;
-        border-left: 2px solid rgba(255,255,255,0.1);
+        border-left: 2px solid rgba(255, 255, 255, 0.1);
         gap: 0;
     }
-    
+
     .nav-links.active {
         right: 0;
     }
-    
+
     .nav-link {
         font-size: 1.2rem;
         padding: 20px 25px;
         text-align: left;
         background: transparent;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 0;
     }
 
@@ -1291,7 +1511,7 @@ input:checked + .toggle-slider:before {
     .landing-container {
         padding: 20px 15px;
     }
-    
+
     .candy-card {
         padding: 20px;
     }
@@ -1306,10 +1526,11 @@ input:checked + .toggle-slider:before {
         font-size: 1.5rem;
     }
 
-    .modal-module p, .modal-module li {
+    .modal-module p,
+    .modal-module li {
         font-size: 0.95rem;
     }
-    
+
     .settings-row {
         font-size: 1rem;
         padding: 8px 10px;
@@ -1318,9 +1539,12 @@ input:checked + .toggle-slider:before {
 
 /* EDGE CASE 1: Force Portrait Mode*/
 #landscape-warning {
-    display: none; 
+    display: none;
     position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background: var(--bg-color);
     z-index: 99999;
     flex-direction: column;
@@ -1328,12 +1552,18 @@ input:checked + .toggle-slider:before {
     justify-content: center;
     text-align: center;
     padding: 20px;
-} 
+}
 
-/* Only show this if width > height (Landscape) on mobile devices */
-@media screen and (max-width: 900px) and (orientation: landscape) {
-    #landscape-warning { display: flex; }
-    #game-screen, #lobby-screen { display: none !important; }
+/* Only show this if width > height (Landscape) on true mobile/touch devices */
+@media screen and (max-height: 600px) and (orientation: landscape) and (pointer: coarse) and (hover: none) {
+    #landscape-warning {
+        display: flex;
+    }
+
+    #game-screen,
+    #lobby-screen {
+        display: none !important;
+    }
 }
 
 /* EDGE CASE 2: Safe Text Handling */
@@ -1341,30 +1571,39 @@ input:checked + .toggle-slider:before {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    
+
     /* ADD THESE LINES */
-    max-width: 100px;  /* Force a limit */
-    overflow: hidden;  /* Hide overflow */
+    max-width: 100px;
+    /* Force a limit */
+    overflow: hidden;
+    /* Hide overflow */
 }
 
 .name {
     color: var(--accent);
     font-size: 1rem;
     letter-spacing: 1px;
-    
+
     /* ADD THESE LINES */
-    white-space: nowrap;      /* Don't wrap to new line */
-    text-overflow: ellipsis;  /* Add "..." at the end */
-    width: 100%;              /* Take available space */
+    white-space: nowrap;
+    /* Don't wrap to new line */
+    text-overflow: ellipsis;
+    /* Add "..." at the end */
+    width: 100%;
+    /* Take available space */
     display: block;
 }
 
 /* CANCEL BUTTON (Centered & Compact) */
 #cancel-room-btn {
-    display: block;       /* Allows margin auto to work */
-    width: fit-content;   /* Shrink to fit the text */
-    margin: 20px auto 0;  /* Top margin 20px, Left/Right Auto (Centers it) */
-    padding: 10px 30px;   /* Comfortable padding */
-    font-size: 1rem;      /* Not too huge */
+    display: block;
+    /* Allows margin auto to work */
+    width: fit-content;
+    /* Shrink to fit the text */
+    margin: 20px auto 0;
+    /* Top margin 20px, Left/Right Auto (Centers it) */
+    padding: 10px 30px;
+    /* Comfortable padding */
+    font-size: 1rem;
+    /* Not too huge */
 }
-

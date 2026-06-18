@@ -1,28 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Cartoon Snap</title>
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="style.css"> 
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Nunito:wght@400;700;900&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <div id="landscape-warning">
-    <h1>🔄</h1>
-    <h2>Please Rotate Your Device</h2>
-    <p>This game is designed for Portrait Mode!</p>
-</div>
+        <h1>🔄</h1>
+        <h2>Please Rotate Your Device</h2>
+        <p>This game is designed for Portrait Mode!</p>
+    </div>
 
     <div class="background-area">
         <ul class="circles">
-            <li></li><li></li><li></li><li></li><li></li>
-            <li></li><li></li><li></li><li></li><li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
         </ul>
     </div>
 
@@ -31,7 +43,7 @@
 
     <!-- NEW STICKY NAVBAR -->
     <nav id="main-nav" class="candy-nav">
-        <img src="/assets/game_logo.png" alt="Cartoon Snap Logo" class="nav-logo">
+        <img src="/assets/game_logo.webp" alt="Cartoon Snap Logo" class="nav-logo">
         <button id="hamburger-menu" class="hamburger-menu">☰</button>
         <div id="nav-links" class="nav-links">
             <button class="nav-link nav-btn" data-modal="rules">How to Play</button>
@@ -55,26 +67,30 @@
     <div id="candy-modal-backdrop" class="candy-modal-backdrop hidden">
         <div class="candy-modal">
             <button id="candy-modal-close" class="close-btn">X</button>
-            
+
             <!-- MODAL CONTENTS -->
             <div id="modal-rules" class="modal-module hidden">
                 <h2>How to Play 🎮</h2>
                 <ul class="rules-list">
                     <li>🃏 <strong>Matching:</strong> Take turns playing cards to the center pile.</li>
                     <li>⚡ <strong>Snapping:</strong> When two matching characters appear, hit SNAP!</li>
-                    <li>❌ <strong>False Snap Penalties:</strong> Hitting SNAP when there's no match skips your next turn!</li>
+                    <li>❌ <strong>False Snap Penalties:</strong> Hitting SNAP when there's no match skips your next
+                        turn!</li>
                 </ul>
             </div>
 
             <div id="modal-about" class="modal-module hidden">
                 <h2>About the Dev 👨‍💻</h2>
-                <p>I'm a third-year CS graduate and full-stack developer who builds in public. This project was built to master raw WebSockets, following previous architecture wins with extensions like FocusFlow and complex UI projects like Datify.</p>
+                <p>I'm a third-year CS graduate and full-stack developer who builds in public. This project was built to
+                    master raw WebSockets, following previous architecture wins with extensions like FocusFlow and
+                    complex UI projects like Datify.</p>
             </div>
 
             <div id="modal-feedback" class="modal-module hidden">
                 <h2>Feedback 💌</h2>
                 <form id="feedback-form">
-                    <textarea id="feedback-text" class="candy-input" placeholder="Enter your feedback..." rows="4" style="width: 100%;"></textarea>
+                    <textarea id="feedback-text" class="candy-input" placeholder="Enter your feedback..." rows="4"
+                        style="width: 100%;"></textarea>
                     <button type="submit" class="secondary-btn candy-btn" style="margin-top: 10px;">Submit</button>
                 </form>
             </div>
@@ -103,14 +119,14 @@
     <div id="lobby-screen" class="lobby-container hidden candy-card">
         <h2 class="candy-title-small">Join the Action</h2>
         <p>Enter your name to get started</p>
-        
+
         <input type="text" id="username-input" class="candy-input" placeholder="Your Name" maxlength="12">
 
         <div class="lobby-controls">
             <button id="create-btn" class="main-btn candy-btn">Create New Game</button>
-            
+
             <div class="divider">- OR -</div>
-            
+
             <div class="join-area">
                 <input type="text" id="room-code-input" class="candy-input" placeholder="ROOM CODE" maxlength="6">
                 <button id="join-btn" class="secondary-btn candy-btn">Join Game</button>
@@ -122,7 +138,7 @@
     <div id="waiting-screen" class="lobby-container hidden">
         <h2>Room Created!</h2>
         <p>Share this code with your friend:</p>
-        
+
         <div class="code-display">
             <span id="display-room-code">LOADING...</span>
         </div>
@@ -133,8 +149,8 @@
         </div>
 
         <button id="cancel-room-btn" class="menu-item danger" style="margin-top: 20px;">
-        ⬅️ Cancel & Back to Lobby
-    </button>
+            ⬅️ Cancel & Back to Lobby
+        </button>
 
         <p class="blinking-text" style="margin-top: 20px;">Waiting for opponent to join...</p>
     </div>
@@ -152,7 +168,7 @@
                 </div>
             </div>
             <div class="deck-container">
-                <div class="card back"></div> 
+                <div class="card back"></div>
             </div>
         </div>
 
@@ -164,14 +180,14 @@
                 <div id="center-pile" class="pile-slot">
                     <div class="placeholder-text">Center Pile</div>
                 </div>
-                
+
                 <button id="snap-btn" class="snap-button hidden">SNAP! ⚡</button>
             </div>
         </div>
 
         <div class="player-zone" id="player-zone">
             <div class="deck-container" id="my-deck">
-                <div class="card back"></div> 
+                <div class="card back"></div>
             </div>
             <div class="player-info">
                 <img id="my-avatar" src="" class="avatar-img hidden">
@@ -202,47 +218,48 @@
         <div class="modal-content">
             <h2 id="winner-title" style="font-size: 3rem; margin-bottom: 10px;">GAME OVER</h2>
             <p id="winner-message" style="font-size: 1.2rem; margin-bottom: 25px;">...</p>
-            
+
             <button id="rematch-btn" class="main-btn">🔄 Rematch</button>
             <button id="exit-btn" class="menu-item danger">🚪 Exit to Lobby</button>
         </div>
     </div>
 
     <div id="menu-modal" class="modal-overlay hidden">
-    <div class="modal-content">
-        <h2>Game Menu</h2>
+        <div class="modal-content">
+            <h2>Game Menu</h2>
 
-        <div id="menu-main-view">
-            <button id="resume-btn" class="menu-item">▶ Resume Game</button>
-            <button id="sound-btn" class="menu-item">🔊 Sound: ON</button>
-            
-            <div class="skin-selector">
-                <h3>Card Style</h3>
-                <div class="skin-options">
-                    <img src="/assets/backs/default.png" data-skin="default" class="skin-option selected">
-                    <img src="/assets/backs/blue.png" data-skin="blue" class="skin-option">
-                    <img src="/assets/backs/modern.png" data-skin="modern" class="skin-option">
+            <div id="menu-main-view">
+                <button id="resume-btn" class="menu-item">▶ Resume Game</button>
+                <button id="sound-btn" class="menu-item">🔊 Sound: ON</button>
+
+                <div class="skin-selector">
+                    <h3>Card Style</h3>
+                    <div class="skin-options">
+                        <img src="/assets/backs/default.webp" data-skin="default" class="skin-option selected">
+                        <img src="/assets/backs/blue.webp" data-skin="blue" class="skin-option">
+                        <img src="/assets/backs/modern.webp" data-skin="modern" class="skin-option">
+                    </div>
                 </div>
+
+                <hr style="margin: 15px 0; opacity: 0.2;">
+
+                <button id="restart-btn" class="menu-item">🔄 Restart Game</button>
+                <button id="leave-btn" class="menu-item danger">🚪 Leave Room</button>
             </div>
-            
-            <hr style="margin: 15px 0; opacity: 0.2;">
 
-            <button id="restart-btn" class="menu-item">🔄 Restart Game</button>
-            <button id="leave-btn" class="menu-item danger">🚪 Leave Room</button>
+            <div id="menu-confirm-view" class="hidden">
+                <p style="margin-bottom: 20px; font-size: 1.2rem; color: #e74c3c;">
+                    ⚠️ You will forfeit the game.
+                </p>
+                <button id="confirm-leave-yes" class="menu-item danger">Yes, Leave</button>
+                <button id="confirm-leave-no" class="menu-item" style="background-color: #95a5a6;">No, Go Back</button>
+            </div>
+
         </div>
-
-        <div id="menu-confirm-view" class="hidden">
-            <p style="margin-bottom: 20px; font-size: 1.2rem; color: #e74c3c;">
-                ⚠️ You will forfeit the game.
-            </p>
-            <button id="confirm-leave-yes" class="menu-item danger">Yes, Leave</button>
-            <button id="confirm-leave-no" class="menu-item" style="background-color: #95a5a6;">No, Go Back</button>
-        </div>
-
     </div>
-</div>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="script.js"></script> 
+    <script src="script.js"></script>
 </body>
+
 </html>
