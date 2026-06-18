@@ -29,7 +29,7 @@ A real-time multiplayer card game built with **Node.js** and **Socket.io**. Two 
 
 3.  **Start the Server**
     ```bash
-    npm run dev
+    npm start
     ```
 
 4.  **Play!**
