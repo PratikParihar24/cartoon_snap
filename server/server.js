@@ -8,10 +8,14 @@ const path = require('path');
 // 1. IMPORT THE NEW LOGIC
 // We are importing the new "Room-aware" functions we just wrote in Step 3
 const { createRoom, joinRoom, playCard, handleSnap, removePlayer ,restartGame , leaveRoom} = require('./gamelogic');
+const compression = require('compression'); // Import compression
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
+
+// Apply Gzip compression to all HTTP responses before static files
+app.use(compression());
 
 app.use(express.static(path.join(__dirname, '../public')));
 
@@ -42,20 +46,20 @@ io.on('connection', (socket) => {
 
     // B. GAMEPLAY LISTENERS (Updated for V2)
     // -------------------------------------------------
-    // Note: We now expect 'data' to contain the { roomId } 
-    // because the server needs to know WHICH game to update.
+    // Phase 2: Socket Event Data Packing
+    const Actions = { PLAY: 1, SNAP: 2 };
 
-    socket.on('play_card', (data) => {
-        // data looks like: { roomId: "X7Z9P" }
-        if (data && data.roomId) {
-            playCard(socket, io, data.roomId);
-        }
-    });
-
-    socket.on('snap_attempt', (data) => {
-        console.log(`⚡ SNAP ATTEMPT from ${socket.id} in Room ${data.roomId}`);
-        if (data && data.roomId) {
-            handleSnap(socket, io, data.roomId);
+    socket.on('game_action', (dataArray) => {
+        // Expected format: [ActionCode, RoomId]
+        if (!Array.isArray(dataArray) || dataArray.length < 2) return;
+        
+        const [actionCode, roomId] = dataArray;
+        
+        if (actionCode === Actions.PLAY) {
+            playCard(socket, io, roomId);
+        } else if (actionCode === Actions.SNAP) {
+            console.log(`⚡ SNAP ATTEMPT from ${socket.id} in Room ${roomId}`);
+            handleSnap(socket, io, roomId);
         }
     });
 
