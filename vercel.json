@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    {
+      "source": "/:path*",
+      "destination": "https://cartoon-snap.onrender.com/",
+      "permanent": true
+    }
+  ]
+}
