@@ -1325,10 +1325,13 @@ input:checked+.toggle-slider:before {
 .status-message {
     font-family: 'Fredoka', sans-serif;
     font-size: 1.5rem;
-    margin-top: 0;
-    /* Reset top margin */
-    margin-bottom: 25px;
-    /* ✅ Add space below it (between text and cards) */
+    position: absolute;
+    bottom: calc(100% + 15px);
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: max-content;
+    white-space: nowrap;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
     z-index: 10;
